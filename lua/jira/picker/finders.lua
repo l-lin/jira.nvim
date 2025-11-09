@@ -28,12 +28,35 @@ function M.jira_issues(opts, ctx)
 
   -- Add format
   local columns = opts.columns or config.columns
-  vim.list_extend(args, { "--plain", "--columns", table.concat(columns, ",") })
+  vim.list_extend(args, { "--csv", "--columns", table.concat(columns, ",") })
 
   -- Debug: print command
   if config.debug then
     local cmd_str = config.jira_cmd .. " " .. table.concat(args, " ")
     vim.notify("JIRA CLI Command:\n" .. cmd_str, vim.log.levels.INFO)
+  end
+
+  -- Simple CSV parser for quoted fields
+  local function parse_csv_line(line)
+    local values = {}
+    local current = ""
+    local in_quotes = false
+    local i = 1
+
+    while i <= #line do
+      local char = line:sub(i, i)
+      if char == '"' then
+        in_quotes = not in_quotes
+      elseif char == "," and not in_quotes then
+        table.insert(values, current)
+        current = ""
+      else
+        current = current .. char
+      end
+      i = i + 1
+    end
+    table.insert(values, current)
+    return values
   end
 
   -- Use snacks proc to run the command
@@ -51,10 +74,10 @@ function M.jira_issues(opts, ctx)
           return false
         end
 
-        -- Parse tab-separated line
-        local values = vim.split(item.text, "\t", { plain = true })
+        -- Parse CSV line
+        local values = parse_csv_line(item.text)
 
-        -- Validate we have enough columns (don't filter empty strings)
+        -- Validate we have enough columns
         if #values < #columns then
           return false
         end
