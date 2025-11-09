@@ -1,5 +1,12 @@
 local M = {}
 
+---Strip ANSI color codes from text
+---@param text string
+---@return string
+local function strip_ansi_codes(text)
+  return text:gsub("\x1b%[[0-9;]*m", "")
+end
+
 ---@param ctx snacks.picker.preview.ctx
 function M.jira_issue_preview(ctx)
   local item = ctx.item
@@ -10,49 +17,42 @@ function M.jira_issue_preview(ctx)
     return
   end
 
-  -- Get type icon from config
   local config = require("jira.config").options
-  local type_icons = config.display.type_icons
-  local icon = type_icons[item.type] or type_icons.default
 
-  -- Build preview text
-  local lines = {
-    "# " .. item.key,
-    "",
-    "**Type**: " .. icon .. " " .. (item.type or "Unknown"),
-    "**Assignee**: " .. (item.assignee or "Unassigned"),
-    "**Status**: " .. (item.status or "Unknown"),
-    "",
-  }
-
-  -- Add labels if present
-  if item.labels and item.labels ~= "" then
-    local labels = vim.split(item.labels, ",")
-    local prefixed_labels = {}
-    for _, label in ipairs(labels) do
-      table.insert(prefixed_labels, "#" .. label)
-    end
-    table.insert(lines, "**Labels**: " .. table.concat(prefixed_labels, " "))
-    table.insert(lines, "")
-  end
-
-  -- Add summary
-  table.insert(lines, "## Summary")
-  table.insert(lines, "")
-  table.insert(lines, item.summary or "No summary available")
-
-  -- Add URL
-  local util = require("jira.util")
-  local base_url = util.get_jira_base_url()
-  table.insert(lines, "")
-  table.insert(lines, "## Links")
-  table.insert(lines, string.format("[View in browser](%s/browse/%s)", base_url, item.key))
-
-  -- Set preview content
+  -- Show loading indicator
   ctx.preview:reset()
   ctx.preview:set_title(item.key)
-  ctx.preview:set_lines(lines)
-  ctx.preview:highlight({ ft = "markdown" })
+  ctx.preview:notify("Loading issue details...", "info")
+
+  -- Build command
+  local cmd = {
+    config.cli.cmd,
+    "issue",
+    "view",
+    item.key,
+    "--plain",
+    "--comments",
+    tostring(config.display.preview_comments),
+  }
+
+  -- Execute command asynchronously
+  vim.system(cmd, { text = true }, vim.schedule_wrap(function(result)
+    if result.code ~= 0 then
+      ctx.preview:reset()
+      ctx.preview:set_title(item.key)
+      ctx.preview:notify("Failed to load issue details", "error")
+      return
+    end
+
+    -- Strip ANSI codes and split into lines
+    local output = strip_ansi_codes(result.stdout or "")
+    local lines = vim.split(output, "\n", { trimempty = false })
+
+    -- Set preview content
+    ctx.preview:reset()
+    ctx.preview:set_title(item.key)
+    ctx.preview:set_lines(lines)
+  end))
 end
 
 return M

@@ -17,9 +17,9 @@ M.defaults = {
   display = {
     type_icons = {
       Bug = "󰃤",
-      Story = "",
-      Task = "",
-      ["Sub-task"] = "",
+      Story = "",
+      Task = "",
+      ["Sub-task"] = "",
       Epic = "󱐋",
       default = "󰄮",
     },
@@ -38,6 +38,7 @@ M.defaults = {
       ["Awaiting Information"] = "Comment",
       ["Triage"] = "DiagnosticInfo",
     },
+    preview_comments = 10,
   },
 
   keymaps = {

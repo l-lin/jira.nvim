@@ -12,6 +12,7 @@
 ---@field type_icons table<string, string> Icons for issue types
 ---@field type_highlights table<string, string> Highlight groups for issue types
 ---@field status_highlights table<string, string> Highlight groups for statuses
+---@field preview_comments number Number of comments to show in preview (default: 0)
 
 ---@class jira.Config
 ---@field cli jira.CliConfig CLI settings
