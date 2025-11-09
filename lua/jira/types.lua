@@ -4,6 +4,6 @@
 ---@field columns string[] Columns to display
 ---@field filters string[] Default filters for sprint list
 ---@field order_by string Sort order field
----@field paginate string Pagination format (e.g., "0:1000")
+---@field paginate string Pagination format (e.g., "0:100")
 ---@field keymaps table<string, string> Custom keymaps
 ---@field debug boolean Enable debug mode to print CLI commands
