@@ -28,7 +28,11 @@ function M.jira_issue_preview(ctx)
   -- Add labels if present
   if item.labels and item.labels ~= "" then
     local labels = vim.split(item.labels, ",")
-    table.insert(lines, "**Labels**: " .. table.concat(labels, ", "))
+    local prefixed_labels = {}
+    for _, label in ipairs(labels) do
+      table.insert(prefixed_labels, "#" .. label)
+    end
+    table.insert(lines, "**Labels**: " .. table.concat(prefixed_labels, " "))
     table.insert(lines, "")
   end
 
