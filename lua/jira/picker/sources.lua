@@ -16,7 +16,7 @@ M.jira_issues = {
     },
     list = {
       keys = {
-        ["<cr>"] = "jira_open_browser",
+        ["<CR>"] = "jira_open_browser",
         ["y"] = "jira_copy_key",
         ["Y"] = "jira_copy_key",
         ["K"] = "jira_show_details",
