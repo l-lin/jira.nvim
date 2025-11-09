@@ -1,5 +1,14 @@
 local M = {}
 
+-- Pad string to fixed display width (handles multi-byte chars)
+local function pad_to_width(str, width)
+  local display_width = vim.fn.strdisplaywidth(str)
+  if display_width >= width then
+    return str
+  end
+  return str .. string.rep(" ", width - display_width)
+end
+
 -- Highlight groups for issue types
 local TYPE_HIGHLIGHTS = {
   Bug = "DiagnosticError",
@@ -38,11 +47,11 @@ function M.jira_issues(item, picker)
   local type_hl = TYPE_HIGHLIGHTS[item.type] or "Comment"
 
   ret[#ret + 1] = { icon .. " ", type_hl }
-  ret[#ret + 1] = { string.format("%-8s", item.type or "Unknown"), type_hl }
+  ret[#ret + 1] = { pad_to_width(item.type or "Unknown", 8), type_hl }
   ret[#ret + 1] = { " " }
 
   -- Issue key (compact)
-  ret[#ret + 1] = { string.format("%-10s", item.key or ""), "Special" }
+  ret[#ret + 1] = { pad_to_width(item.key or "", 10), "Special" }
   ret[#ret + 1] = { " " }
 
   -- Assignee (compact)
@@ -50,13 +59,13 @@ function M.jira_issues(item, picker)
   if assignee == "" then
     assignee = "Unassigned"
   end
-  ret[#ret + 1] = { string.format("%-18s", assignee), "Identifier" }
+  ret[#ret + 1] = { pad_to_width(assignee, 18), "Identifier" }
   ret[#ret + 1] = { " " }
 
   -- Status badge (compact)
   local status = item.status or "Unknown"
   local status_hl = STATUS_HIGHLIGHTS[status] or "Comment"
-  ret[#ret + 1] = { string.format("%-22s", status), status_hl }
+  ret[#ret + 1] = { pad_to_width(status, 22), status_hl }
   ret[#ret + 1] = { " " }
 
   -- Summary (main text) - no width constraint
