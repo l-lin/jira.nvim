@@ -90,7 +90,7 @@ function M.jira_issues(opts, ctx)
 
         -- Return picker item
         return {
-          text = string.format("%s: %s", issue.key or "", issue.summary or ""),
+          text = string.format("%s %s %s %s", issue.key or "", issue.assignee or "", issue.status or "", issue.summary or ""),
           key = issue.key,
           type = issue.type,
           assignee = issue.assignee,
