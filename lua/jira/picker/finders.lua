@@ -63,23 +63,20 @@ function M.jira_issues(opts, ctx)
         -- Parse tab-separated line
         local values = vim.split(item.text, "\t", { plain = true })
 
-        -- Filter out empty strings from consecutive tabs
-        local filtered = {}
-        for _, v in ipairs(values) do
-          if v ~= "" then
-            table.insert(filtered, v)
+        -- Validate we have enough columns (don't filter empty strings)
+        if #values < #columns then
+          if config.debug then
+            vim.schedule(function()
+              vim.notify(string.format("Skipping line: expected %d columns, got %d", #columns, #values), vim.log.levels.WARN)
+            end)
           end
-        end
-
-        -- Validate we have enough columns
-        if #filtered < #columns then
           return false
         end
 
         -- Map values to column names
         local issue = {}
         for i, col in ipairs(columns) do
-          issue[col] = filtered[i] or ""
+          issue[col] = values[i] or ""
         end
 
         -- Debug logging
