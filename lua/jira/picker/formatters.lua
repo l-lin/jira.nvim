@@ -9,25 +9,6 @@ local function pad_to_width(str, width)
   return str .. string.rep(" ", width - display_width)
 end
 
--- Highlight groups for issue types
-local TYPE_HIGHLIGHTS = {
-  Bug = "DiagnosticError",
-  Story = "DiagnosticInfo",
-  Task = "DiagnosticWarn",
-  Epic = "Special",
-}
-
--- Highlight groups for statuses
-local STATUS_HIGHLIGHTS = {
-  ["To Do"] = "DiagnosticHint",
-  ["In Progress"] = "DiagnosticWarn",
-  ["In Review"] = "DiagnosticInfo",
-  ["Done"] = "DiagnosticOk",
-  ["Blocked"] = "DiagnosticError",
-  ["Awaiting Information"] = "Comment",
-  ["Triage"] = "DiagnosticInfo",
-}
-
 ---Format issue item for display
 ---@param item snacks.picker.Item
 ---@param picker snacks.Picker
@@ -39,7 +20,8 @@ function M.jira_issues(item, picker)
   local config = require("jira.config").options
   local type_icons = config.type_icons
   local icon = type_icons[item.type] or type_icons.default
-  local type_hl = TYPE_HIGHLIGHTS[item.type] or "Comment"
+  local type_highlights = config.type_highlights
+  local type_hl = type_highlights[item.type] or "Comment"
 
   ret[#ret + 1] = { icon .. " ", type_hl }
 
@@ -57,7 +39,8 @@ function M.jira_issues(item, picker)
 
   -- Status badge (compact)
   local status = item.status or "Unknown"
-  local status_hl = STATUS_HIGHLIGHTS[status] or "Comment"
+  local status_highlights = config.status_highlights
+  local status_hl = status_highlights[status] or "Comment"
   ret[#ret + 1] = { pad_to_width(status, 22), status_hl }
   ret[#ret + 1] = { " " }
 

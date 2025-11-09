@@ -17,6 +17,21 @@ M.defaults = {
     Epic = "󱐋",
     default = "󰄮",
   },
+  type_highlights = {
+    Bug = "DiagnosticError",
+    Story = "DiagnosticInfo",
+    Task = "DiagnosticWarn",
+    Epic = "Special",
+  },
+  status_highlights = {
+    ["To Do"] = "DiagnosticHint",
+    ["In Progress"] = "DiagnosticWarn",
+    ["In Review"] = "DiagnosticInfo",
+    ["Done"] = "DiagnosticOk",
+    ["Blocked"] = "DiagnosticError",
+    ["Awaiting Information"] = "Comment",
+    ["Triage"] = "DiagnosticInfo",
+  },
   keymaps = {
     open_browser = "<cr>",
     copy_key = "y",

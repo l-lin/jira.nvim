@@ -6,5 +6,7 @@
 ---@field order_by string Sort order field
 ---@field paginate string Pagination format (e.g., "0:100")
 ---@field type_icons table<string, string> Icons for issue types
+---@field type_highlights table<string, string> Highlight groups for issue types
+---@field status_highlights table<string, string> Highlight groups for statuses
 ---@field keymaps table<string, string> Custom keymaps
 ---@field debug boolean Enable debug mode to print CLI commands
