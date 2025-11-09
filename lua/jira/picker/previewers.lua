@@ -1,14 +1,13 @@
 local M = {}
 
----@param item snacks.picker.Item
----@param opts table
----@param ctx snacks.picker.Context
-function M.jira_issue_preview(item, opts, ctx)
+---@param ctx snacks.picker.preview.ctx
+function M.jira_issue_preview(ctx)
+  local item = ctx.item
+
   if not item or not item.key then
-    return {
-      text = "No issue selected",
-      ft = "text",
-    }
+    ctx.preview:reset()
+    ctx.preview:notify("No issue selected", "warn")
+    return
   end
 
   -- Build preview text
@@ -40,10 +39,11 @@ function M.jira_issue_preview(item, opts, ctx)
   table.insert(lines, "## Links")
   table.insert(lines, string.format("[View in browser](%s/browse/%s)", base_url, item.key))
 
-  return {
-    text = table.concat(lines, "\n"),
-    ft = "markdown",
-  }
+  -- Set preview content
+  ctx.preview:reset()
+  ctx.preview:set_title(item.key)
+  ctx.preview:set_lines(lines)
+  ctx.preview:highlight({ ft = "markdown" })
 end
 
 return M

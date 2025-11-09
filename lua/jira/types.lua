@@ -5,3 +5,4 @@
 ---@field filters string[] Default filters for sprint list
 ---@field order_by string Sort order field
 ---@field keymaps table<string, string> Custom keymaps
+---@field debug boolean Enable debug mode to print CLI commands

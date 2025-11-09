@@ -26,7 +26,14 @@ function M.jira_issues(opts, ctx)
   local columns = opts.columns or config.columns
   vim.list_extend(args, { "--plain", "--columns", table.concat(columns, ",") })
 
+  -- Debug: print command
+  if config.debug then
+    local cmd_str = config.jira_cmd .. " " .. table.concat(args, " ")
+    vim.notify("JIRA CLI Command:\n" .. cmd_str, vim.log.levels.INFO)
+  end
+
   -- Use snacks proc to run the command
+  local first_line = true
   return require("snacks.picker.source.proc").proc(
     ctx:opts({
       cmd = config.jira_cmd,
@@ -34,22 +41,38 @@ function M.jira_issues(opts, ctx)
       notify = true,
       ---@param item snacks.picker.finder.Item
       transform = function(item)
+        -- Skip header line
+        if first_line then
+          first_line = false
+          return false
+        end
+
         -- Parse tab-separated line
         local values = vim.split(item.text, "\t", { plain = true })
-        if #values < #columns then
+
+        -- Filter out empty strings from consecutive tabs
+        local filtered = {}
+        for _, v in ipairs(values) do
+          if v ~= "" then
+            table.insert(filtered, v)
+          end
+        end
+
+        -- Validate we have enough columns
+        if #filtered < #columns then
           return false
         end
 
         -- Map values to column names
         local issue = {}
         for i, col in ipairs(columns) do
-          issue[col] = values[i] or ""
+          issue[col] = filtered[i] or ""
         end
 
         -- Return picker item
         return {
-          text = string.format("%s: %s", issue.id or "", issue.summary or ""),
-          key = issue.id,
+          text = string.format("%s: %s", issue.key or "", issue.summary or ""),
+          key = issue.key,
           type = issue.type,
           assignee = issue.assignee,
           status = issue.status,

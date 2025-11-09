@@ -120,10 +120,13 @@ function M.jira_transition(picker, item, action)
 
   -- Get available transitions
   local config = require("jira.config").options
-  local result = vim.system(
-    { config.jira_cmd, "issue", "transitions", item.key, "--plain" },
-    { text = true }
-  ):wait()
+  local cmd = { config.jira_cmd, "issue", "transitions", item.key, "--plain" }
+
+  if config.debug then
+    vim.notify("JIRA CLI Command:\n" .. table.concat(cmd, " "), vim.log.levels.INFO)
+  end
+
+  local result = vim.system(cmd, { text = true }):wait()
 
   if result.code ~= 0 then
     vim.notify("Failed to fetch transitions", vim.log.levels.ERROR)
@@ -146,10 +149,13 @@ function M.jira_transition(picker, item, action)
     end
 
     -- Execute transition
-    local transition_result = vim.system(
-      { config.jira_cmd, "issue", "move", item.key, choice },
-      { text = true }
-    ):wait()
+    local move_cmd = { config.jira_cmd, "issue", "move", item.key, choice }
+
+    if config.debug then
+      vim.notify("JIRA CLI Command:\n" .. table.concat(move_cmd, " "), vim.log.levels.INFO)
+    end
+
+    local transition_result = vim.system(move_cmd, { text = true }):wait()
 
     if transition_result.code == 0 then
       vim.notify(string.format("Transitioned %s to %s", item.key, choice), vim.log.levels.INFO)
