@@ -23,6 +23,8 @@ local function transform_to_markdown(lines)
   local metadata_lines = {}
   local title_line = nil
   local in_header = true
+  local in_comments_section = false
+  local first_comment = true
 
   for i, line in ipairs(lines) do
     -- Collect metadata and title at the beginning (first ~15 lines before sections)
@@ -68,7 +70,39 @@ local function transform_to_markdown(lines)
       end
       table.insert(result, "")
       table.insert(result, "## " .. section)
+
+      -- Check if this is the Comments section
+      if section:match("^%d+%s+Comments?$") then
+        in_comments_section = true
+        first_comment = true
+      else
+        in_comments_section = false
+      end
     else
+      -- Detect comment author lines (Name • Date format)
+      local trimmed = trim_line(line)
+      if in_comments_section and trimmed:match("^[^•]+•[^•]+") and not trimmed:match("^%s*$") then
+        -- This is a comment author line
+        -- Check if it's the latest comment
+        local is_latest = trimmed:match("•%s*Latest comment")
+
+        -- Remove "• Latest comment" if present
+        local author_line = trimmed:gsub("%s*•%s*Latest comment%s*$", "")
+
+        -- Add spacing before comment (except first one)
+        if not first_comment then
+          table.insert(result, "")
+        end
+        first_comment = false
+
+        -- Format as H3 with emoji for latest comment
+        if is_latest then
+          table.insert(result, "### 🔥 " .. author_line)
+        else
+          table.insert(result, "### " .. author_line)
+        end
+        goto continue
+      end
       -- Detect code blocks (stack traces with file paths and line numbers)
       local is_code_line = line:match("%.rb:%d+") or
                            line:match("%.py:%d+") or
