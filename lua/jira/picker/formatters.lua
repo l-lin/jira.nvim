@@ -79,8 +79,8 @@ function M.jira_format_action(item, picker)
     -- Number
     ret[#ret + 1] = { num, "Number" }
 
-    -- Description
-    ret[#ret + 1] = { rest, "Normal" }
+    -- Description (no highlight group = use default picker text highlight)
+    ret[#ret + 1] = { rest }
   else
     -- Fallback if format doesn't match
     ret[#ret + 1] = { item.text, "Normal" }
