@@ -69,12 +69,12 @@ end
 function M.jira_format_action(item, picker)
   local ret = {}
 
-  -- Format: "icon number. description"
-  local icon, num, rest = item.text:match("^([^%s]+)%s(%d+%.%s)(.*)$")
+  -- Format: "icon  number. description" (two spaces after icon)
+  local icon, num, rest = item.text:match("^([^%s]+)%s+(%d+%.%s)(.*)$")
 
   if icon and num and rest then
-    -- Icon
-    ret[#ret + 1] = { icon .. " ", "Special" }
+    -- Icon with two spaces
+    ret[#ret + 1] = { icon .. "  ", "Special" }
 
     -- Number
     ret[#ret + 1] = { num, "Number" }
