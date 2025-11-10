@@ -9,9 +9,6 @@ M.jira_issues = {
   win = {
     input = {
       title = "JIRA Issues (Current Sprint)",
-      keys = {
-        ["<C-r>"] = "refresh",
-      },
     },
     list = {
       keys = {
