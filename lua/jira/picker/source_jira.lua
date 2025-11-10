@@ -45,7 +45,13 @@ function M.get_actions(opts, ctx)
   ---@async
   return function(cb)
     for i, it in ipairs(items) do
-      it.text = ("%d. %s"):format(i, it.text)
+      -- Extract icon from the beginning of text (emoji followed by space)
+      local icon, rest = it.text:match("^([^%s]+)%s(.+)$")
+      if icon and rest then
+        it.text = ("%s %d. %s"):format(icon, i, rest)
+      else
+        it.text = ("%d. %s"):format(i, it.text)
+      end
       cb(it)
     end
   end

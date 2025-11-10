@@ -69,15 +69,17 @@ end
 function M.jira_format_action(item, picker)
   local ret = {}
 
-  -- The text already contains the number prefix from the finder
-  -- Parse it to apply different highlights
-  local num, rest = item.text:match("^(%d+%.%s)(.*)$")
+  -- Format: "icon number. description"
+  local icon, num, rest = item.text:match("^([^%s]+)%s(%d+%.%s)(.*)$")
 
-  if num then
+  if icon and num and rest then
+    -- Icon
+    ret[#ret + 1] = { icon .. " ", "Special" }
+
     -- Number
     ret[#ret + 1] = { num, "Number" }
 
-    -- Icon + description (rest contains "icon name")
+    -- Description
     ret[#ret + 1] = { rest, "Normal" }
   else
     -- Fallback if format doesn't match
