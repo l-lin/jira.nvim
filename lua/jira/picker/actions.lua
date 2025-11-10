@@ -253,7 +253,7 @@ local function jira_comment(picker, item, action)
     end
 
     local config = require("jira.config").options
-    local cmd = { config.cli.cmd, "issue", "comment", "add", item.key, "-m", comment }
+    local cmd = { config.cli.cmd, "issue", "comment", "add", item.key, comment }
 
     if config.debug then
       vim.notify("JIRA CLI Command:\n" .. table.concat(cmd, " "), vim.log.levels.INFO)
