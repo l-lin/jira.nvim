@@ -98,8 +98,8 @@ local function transform_to_markdown(lines)
         -- Remove "• Latest comment" if present
         local author_line = trimmed:gsub("%s*•%s*Latest comment%s*$", "")
 
-        -- Add spacing before comment (except first one)
-        if not first_comment then
+        -- Add spacing before comment (except first one) if last line isn't blank
+        if not first_comment and #result > 0 and result[#result] ~= "" then
           table.insert(result, "")
         end
         first_comment = false
