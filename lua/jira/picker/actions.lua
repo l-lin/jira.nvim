@@ -91,29 +91,6 @@ local function jira_show_details(picker, item, action)
   vim.keymap.set("n", "<Esc>", "<cmd>close<cr>", { buffer = buf, nowait = true })
 end
 
---- View issue in jira CLI
----@param picker snacks.Picker
----@param item snacks.picker.Item
----@param action snacks.picker.Action
-local function jira_view_cli(picker, item, action)
-  if not item.key then
-    vim.notify("No issue key available", vim.log.levels.WARN)
-    return
-  end
-
-  local config = require("jira.config").options
-
-  -- Open in terminal
-  vim.cmd("tabnew")
-  vim.fn.termopen({ config.cli.cmd, "issue", "view", item.key }, {
-    on_exit = function(_, code)
-      if code ~= 0 then
-        vim.notify("Failed to view issue", vim.log.levels.ERROR)
-      end
-    end,
-  })
-end
-
 --- Transition issue to different status
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
@@ -329,14 +306,6 @@ M.actions.show_details = {
   action = jira_show_details,
 }
 
-M.actions.view_cli = {
-  name = "View in CLI",
-  desc = "Open issue in terminal",
-  icon = "🖥️",
-  priority = 30,
-  action = jira_view_cli,
-}
-
 --- Get available actions for an item
 ---@param item snacks.picker.Item
 ---@param ctx table?
@@ -388,7 +357,6 @@ end
 M.jira_open_browser = jira_open_browser
 M.jira_copy_key = jira_copy_key
 M.jira_show_details = jira_show_details
-M.jira_view_cli = jira_view_cli
 M.jira_transition = jira_transition
 
 return M

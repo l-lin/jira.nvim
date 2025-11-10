@@ -1,6 +1,7 @@
 local M = {}
 
 M.jira_issues = {
+  title = "JIRA Issues",
   finder = require("jira.picker.finders").jira_issues,
   format = "jira_issues",
   preview = "jira_issue_preview",
@@ -16,7 +17,6 @@ M.jira_issues = {
         ["y"] = "jira_copy_key",
         ["Y"] = "jira_copy_key",
         ["K"] = "jira_show_details",
-        ["gv"] = "jira_view_cli",
         ["gt"] = "jira_transition",
       },
     },
