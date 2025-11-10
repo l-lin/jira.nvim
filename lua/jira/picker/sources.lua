@@ -1,17 +1,17 @@
 local M = {}
 
-M.jira_issues = {
-  title = "JIRA Issues",
-  finder = require("jira.picker.finders").jira_issues,
-  format = "jira_issues",
-  preview = "jira_issue_preview",
-  confirm = "jira_actions",
+local function build_jira_issues()
+  local config = require("jira.config").options
+  local keymaps = config.keymaps
 
-  win = function()
-    local config = require("jira.config").options
-    local keymaps = config.keymaps
+  return {
+    title = "JIRA Issues",
+    finder = require("jira.picker.finders").jira_issues,
+    format = "jira_issues",
+    preview = "jira_issue_preview",
+    confirm = "jira_actions",
 
-    return {
+    win = {
       input = {
         title = "JIRA Issues (Current Sprint)",
         keys = {
@@ -26,9 +26,11 @@ M.jira_issues = {
           [keymaps.list.transition] = "jira_transition",
         },
       },
-    }
-  end,
-}
+    },
+  }
+end
+
+M.jira_issues = build_jira_issues()
 
 M.jira_actions = {
   layout = { preset = "select", layout = { max_width = 60 } },
