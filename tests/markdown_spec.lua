@@ -22,14 +22,14 @@ if not _G.vim then
   }
 end
 
-describe("previewers", function()
+describe("markdown", function()
   -- Load the module being tested
-  local previewers = require("jira.picker.previewers")
+  local markdown = require("jira.markdown")
 
   -- Access private functions exposed for testing
-  local strip_ansi_codes = previewers._strip_ansi_codes
-  local trim_line = previewers._trim_line
-  local transform_to_markdown = previewers._transform_to_markdown
+  local strip_ansi_codes = markdown._strip_ansi_codes
+  local trim_line = markdown._trim_line
+  local transform_to_markdown = markdown._transform_to_markdown
 
   describe("strip_ansi_codes", function()
     it("should remove ANSI color codes", function()
