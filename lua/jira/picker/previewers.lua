@@ -7,6 +7,13 @@ local function strip_ansi_codes(text)
   return text:gsub("\x1b%[[0-9;]*m", "")
 end
 
+---Trim leading 2 spaces and trailing whitespace from a line
+---@param line string
+---@return string
+local function trim_line(line)
+  return (line:gsub("^  ", ""):gsub("%s+$", ""))
+end
+
 ---Transform plain text output to markdown format
 ---@param lines string[]
 ---@return string[]
@@ -30,7 +37,7 @@ local function transform_to_markdown(lines)
         goto continue
       elseif line:match("^%s*#%s*.+") then
         -- This is the title line
-        title_line = line:gsub("^%s+", "")
+        title_line = trim_line(line)
         goto continue
       elseif line:match("^%s*$") then
         -- Skip empty lines in header section
@@ -74,23 +81,22 @@ local function transform_to_markdown(lines)
         -- Start code block
         in_code_block = true
         table.insert(result, "```")
-        table.insert(result, line)
+        table.insert(result, trim_line(line))
       elseif in_code_block and (is_code_line or line:match("^%s+%S")) then
         -- Continue code block (code line or indented line)
-        table.insert(result, line)
+        table.insert(result, trim_line(line))
       elseif in_code_block and line:match("^%s*$") then
         -- Keep empty lines in code block
-        table.insert(result, line)
+        table.insert(result, "")
       elseif in_code_block then
         -- End code block when we hit non-code content
         table.insert(result, "```")
         table.insert(result, "")
         in_code_block = false
-        -- Strip leading 2 spaces from content lines
-        table.insert(result, (line:gsub("^  ", "")))
+        table.insert(result, trim_line(line))
       else
-        -- Normal line - strip leading 2 spaces from content lines
-        table.insert(result, (line:gsub("^  ", "")))
+        -- Normal line
+        table.insert(result, trim_line(line))
       end
     end
 
