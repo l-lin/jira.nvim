@@ -6,7 +6,7 @@ M.jira_issues = {
   preview = "jira_issue_preview",
   live = false,
   limit = math.huge,
-  confirm = "jira_open_browser",
+  confirm = "jira_actions",
 
   win = {
     input = {
