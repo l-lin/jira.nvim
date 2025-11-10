@@ -46,13 +46,13 @@ local function transform_to_markdown(lines)
         goto continue
       else
         -- End of header section
+        if title_line then
+          table.insert(result, title_line)
+          table.insert(result, "")
+        end
         if #metadata_lines > 0 then
           -- Merge all metadata into one line
           table.insert(result, table.concat(metadata_lines, " "))
-          table.insert(result, "")
-        end
-        if title_line then
-          table.insert(result, title_line)
         end
         in_header = false
       end
