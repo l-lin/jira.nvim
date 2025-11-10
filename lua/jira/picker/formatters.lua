@@ -62,4 +62,26 @@ function M.jira_issues(item, picker)
   return ret
 end
 
+---Format action item for display in action dialog
+---@param item snacks.picker.Item
+---@param picker snacks.Picker
+---@return snacks.picker.Highlight[]
+function M.jira_format_action(item, picker)
+  local ret = {}
+
+  -- Icon
+  if item.action and item.action.icon then
+    ret[#ret + 1] = { item.action.icon .. " ", "Special" }
+  end
+
+  -- Action name
+  ret[#ret + 1] = { pad_to_width(item.action and item.action.name or item.name or "", 20), "Title" }
+  ret[#ret + 1] = { " " }
+
+  -- Description
+  ret[#ret + 1] = { item.desc or "", "Comment" }
+
+  return ret
+end
+
 return M

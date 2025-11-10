@@ -17,7 +17,7 @@ M.jira_issues = {
     },
     list = {
       keys = {
-        ["<CR>"] = "jira_open_browser",
+        ["<CR>"] = "jira_actions",
         ["y"] = "jira_copy_key",
         ["Y"] = "jira_copy_key",
         ["K"] = "jira_show_details",
@@ -26,6 +26,14 @@ M.jira_issues = {
       },
     },
   },
+}
+
+M.jira_actions = {
+  layout = { preset = "select", layout = { max_width = 60 } },
+  title = "  Actions",
+  main = { current = true },
+  finder = require("jira.picker.source_jira").get_actions,
+  format = "jira_format_action",
 }
 
 return M
