@@ -1,6 +1,3 @@
----Markdown formatter for JIRA issue text
-local M = {}
-
 ---Strip ANSI color codes from text
 ---@param text string
 ---@return string
@@ -286,7 +283,7 @@ end
 ---Convert JIRA issue plain text to markdown
 ---@param text string Plain text with ANSI codes
 ---@return string[] Markdown formatted lines
-function M.format_issue(text)
+local function format_issue(text)
   -- Strip ANSI codes and split into lines
   local clean_text = strip_ansi_codes(text)
   local lines = vim.split(clean_text, "\n", { trimempty = false })
@@ -295,7 +292,7 @@ function M.format_issue(text)
   return transform_to_markdown(lines)
 end
 
--- Expose functions for testing
+local M = {}
 M._strip_ansi_codes = strip_ansi_codes
 M._trim_line = trim_line
 M._is_code_line = is_code_line
@@ -304,5 +301,5 @@ M._format_comment_author = format_comment_author
 M._format_section_header = format_section_header
 M._process_header = process_header
 M._transform_to_markdown = transform_to_markdown
-
+M.format_issue = format_issue
 return M

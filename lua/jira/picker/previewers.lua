@@ -1,7 +1,5 @@
-local M = {}
-
 ---@param ctx snacks.picker.preview.ctx
-function M.jira_issue_preview(ctx)
+local function preview_jira_issue(ctx)
   local item = ctx.item
 
   if not item or not item.key then
@@ -51,4 +49,6 @@ function M.jira_issue_preview(ctx)
   end))
 end
 
+local M = {}
+M.preview_jira_issue = preview_jira_issue
 return M

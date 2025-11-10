@@ -1,13 +1,8 @@
-local M = {}
-
---- All available actions with metadata
-M.actions = {}
-
 --- Open issue in browser
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function jira_open_browser(picker, item, action)
+local function action_jira_open_browser(picker, item, action)
   if not item.key then
     vim.notify("No issue key available", vim.log.levels.WARN)
     return
@@ -33,7 +28,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function jira_copy_key(picker, item, action)
+local function action_jira_copy_key(picker, item, action)
   if not item.key then
     vim.notify("No issue key available", vim.log.levels.WARN)
     return
@@ -110,7 +105,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function jira_transition(picker, item, action)
+local function action_jira_transition(picker, item, action)
   if not item.key then
     vim.notify("No issue key available", vim.log.levels.WARN)
     return
@@ -163,7 +158,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function jira_assign_me(picker, item, action)
+local function action_jira_assign_me(picker, item, action)
   if not item.key then
     vim.notify("No issue key available", vim.log.levels.WARN)
     return
@@ -192,7 +187,10 @@ local function jira_assign_me(picker, item, action)
     vim.notify(string.format("Assigned %s to you", item.key), vim.log.levels.INFO)
     picker:refresh()
   else
-    vim.notify(string.format("Failed to assign %s: %s", item.key, result.stderr or "Unknown error"), vim.log.levels.ERROR)
+    vim.notify(
+      string.format("Failed to assign %s: %s", item.key, result.stderr or "Unknown error"),
+      vim.log.levels.ERROR
+    )
   end
 end
 
@@ -200,7 +198,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function jira_unassign(picker, item, action)
+local function action_jira_unassign(picker, item, action)
   if not item.key then
     vim.notify("No issue key available", vim.log.levels.WARN)
     return
@@ -219,7 +217,10 @@ local function jira_unassign(picker, item, action)
     vim.notify(string.format("Unassigned %s", item.key), vim.log.levels.INFO)
     picker:refresh()
   else
-    vim.notify(string.format("Failed to unassign %s: %s", item.key, result.stderr or "Unknown error"), vim.log.levels.ERROR)
+    vim.notify(
+      string.format("Failed to unassign %s: %s", item.key, result.stderr or "Unknown error"),
+      vim.log.levels.ERROR
+    )
   end
 end
 
@@ -227,7 +228,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function jira_comment(picker, item, action)
+local function action_jira_comment(picker, item, action)
   if not item.key then
     vim.notify("No issue key available", vim.log.levels.WARN)
     return
@@ -259,73 +260,63 @@ local function jira_comment(picker, item, action)
 end
 
 --- Define all actions with metadata
-M.actions.open_browser = {
-  name = "Open in browser",
-  icon = " ",
-  priority = 100,
-  action = jira_open_browser,
-}
-
-M.actions.copy_key = {
-  name = "Copy key to clipboard",
-  icon = " ",
-  priority = 90,
-  action = jira_copy_key,
-}
-
-M.actions.transition = {
-  name = "Edit status",
-  icon = " ",
-  priority = 80,
-  action = jira_transition,
-}
-
-M.actions.assign_me = {
-  name = "Assign to me",
-  icon = " ",
-  priority = 70,
-  action = jira_assign_me,
-}
-
-M.actions.unassign = {
-  name = "Unassign",
-  icon = " ",
-  priority = 60,
-  action = jira_unassign,
-}
-
-M.actions.comment = {
-  name = "Add comment",
-  icon = " ",
-  priority = 50,
-  action = jira_comment,
-}
-
 --- Get available actions for an item
 ---@param item snacks.picker.Item
 ---@param ctx table?
 ---@return table<string, table> actions Map of action name to action metadata
-function M.get_actions(item, ctx)
-  return M.actions
-end
+local function get_jira_actions(item, ctx)
+  return {
+    open_browser = {
+      name = "Open in browser",
+      icon = " ",
+      priority = 100,
+      action = action_jira_open_browser,
+    },
 
---- Perform selected action
----@param picker snacks.Picker
----@param item snacks.picker.Item
----@param action snacks.picker.Action
-function M.jira_perform_action(picker, item, action)
-  if action.action and type(action.action) == "function" then
-    action.action(picker, item, action)
-  end
+    copy_key = {
+      name = "Copy key to clipboard",
+      icon = " ",
+      priority = 90,
+      action = action_jira_copy_key,
+    },
+
+    transition = {
+      name = "Edit status",
+      icon = " ",
+      priority = 80,
+      action = action_jira_transition,
+    },
+
+    assign_me = {
+      name = "Assign to me",
+      icon = " ",
+      priority = 70,
+      action = action_jira_assign_me,
+    },
+
+    unassign = {
+      name = "Unassign",
+      icon = " ",
+      priority = 60,
+      action = action_jira_unassign,
+    },
+
+    comment = {
+      name = "Add comment",
+      icon = " ",
+      priority = 50,
+      action = action_jira_comment,
+    },
+  }
 end
 
 --- Action to show action dialog
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-function M.jira_actions(picker, item, action)
+local function action_jira_list_actions(picker, item, action)
   local Snacks = require("snacks")
-  Snacks.picker.jira_actions({
+  Snacks.picker.source_jira_actions({
     item = item,
     confirm = function(action_picker, action_item, selected_action)
       if not action_item then
@@ -348,9 +339,14 @@ function M.jira_actions(picker, item, action)
   })
 end
 
--- Backward compatibility: export individual action functions
-M.jira_open_browser = jira_open_browser
-M.jira_copy_key = jira_copy_key
-M.jira_transition = jira_transition
+local M = {}
+M.get_jira_actions = get_jira_actions
 
+M.action_jira_list_actions = action_jira_list_actions
+M.action_jira_open_browser = action_jira_open_browser
+M.action_jira_copy_key = action_jira_copy_key
+M.action_jira_transition = action_jira_transition
+M.action_jira_assign_me = action_jira_assign_me
+M.action_jira_unassign = action_jira_unassign
+M.action_jira_comment = action_jira_comment
 return M

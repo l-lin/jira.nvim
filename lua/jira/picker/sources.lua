@@ -2,11 +2,9 @@
 ---@param opts snacks.picker.finder_opts Options passed to the finder
 ---@param ctx snacks.picker.finder_context Context for the finder
 local function get_actions(opts, ctx)
-  local actions_module = require("jira.picker.actions")
   local item = opts.item or (ctx.ctx and ctx.ctx.item) or ctx.item
 
-  -- Get actions for the current item
-  local actions = actions_module.get_actions(item, ctx)
+  local actions = require("jira.picker.actions").get_jira_actions(item, ctx)
 
   local items = {}
   for name, action_def in pairs(actions) do
@@ -50,24 +48,20 @@ local function build_jira_issues()
 
   return {
     title = "JIRA Issues",
-    finder = require("jira.picker.finders").jira_issues,
-    format = "jira_issues",
-    preview = "jira_issue_preview",
-    confirm = "jira_actions",
+    finder = require("jira.picker.finders"),
+    format = "format_jira_issues",
+    preview = "preview_jira_issue",
+    confirm = "action_jira_list_actions",
 
     win = {
       input = {
         title = "JIRA Issues (Current Sprint)",
-        keys = {
-          [keymaps.input.copy_key] = "jira_copy_key",
-          [keymaps.input.transition] = "jira_transition",
-        },
       },
       list = {
         keys = {
-          [keymaps.list.actions] = "jira_actions",
-          [keymaps.list.copy_key] = "jira_copy_key",
-          [keymaps.list.transition] = "jira_transition",
+          [keymaps.list.actions] = "action_jira_list_actions",
+          [keymaps.list.copy_key] = "action_jira_copy_key",
+          [keymaps.list.transition] = "action_jira_transition",
         },
       },
     },
@@ -76,11 +70,11 @@ end
 
 local M = {}
 M.jira_issues = build_jira_issues()
-M.jira_actions = {
+M.source_jira_actions = {
   layout = { preset = "select", layout = { max_width = 60 } },
   title = "  Actions",
   main = { current = true },
   finder = get_actions,
-  format = "jira_format_action",
+  format = "format_jira_action",
 }
 return M

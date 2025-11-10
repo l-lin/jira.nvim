@@ -1,5 +1,3 @@
-local M = {}
-
 -- Pad string to fixed display width (handles multi-byte chars)
 local function pad_to_width(str, width)
   local display_width = vim.fn.strdisplaywidth(str)
@@ -13,7 +11,7 @@ end
 ---@param item snacks.picker.Item
 ---@param picker snacks.Picker
 ---@return snacks.picker.Highlight[]
-function M.jira_issues(item, picker)
+local function format_jira_issues(item, picker)
   local ret = {}
 
   -- Type badge with icon (more compact)
@@ -66,7 +64,7 @@ end
 ---@param item snacks.picker.Item
 ---@param picker snacks.Picker
 ---@return snacks.picker.Highlight[]
-function M.jira_format_action(item, picker)
+local function format_jira_action(item, picker)
   local ret = {}
 
   -- Format: "icon  number. description" (two spaces after icon)
@@ -89,4 +87,7 @@ function M.jira_format_action(item, picker)
   return ret
 end
 
+local M = {}
+M.format_jira_issues = format_jira_issues
+M.format_jira_action = format_jira_action
 return M
