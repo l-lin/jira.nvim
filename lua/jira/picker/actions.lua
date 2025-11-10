@@ -58,28 +58,20 @@ local function jira_transition(picker, item, action)
     return
   end
 
-  -- Get available transitions
   local config = require("jira.config").options
-  local cmd = { config.cli.cmd, "issue", "transitions", item.key, "--plain" }
 
-  if config.debug then
-    vim.notify("JIRA CLI Command:\n" .. table.concat(cmd, " "), vim.log.levels.INFO)
-  end
-
-  local result = vim.system(cmd, { text = true }):wait()
-
-  if result.code ~= 0 then
-    vim.notify("Failed to fetch transitions", vim.log.levels.ERROR)
-    return
-  end
-
-  -- Parse transitions and show picker
-  local transitions = vim.split(result.stdout, "\n", { trimempty = true })
-
-  if #transitions == 0 then
-    vim.notify("No transitions available", vim.log.levels.INFO)
-    return
-  end
+  -- Common JIRA transitions - can be customized via config
+  local transitions = {
+    "To Do",
+    "In Progress",
+    "In Review",
+    "Done",
+    "Blocked",
+    "Backlog",
+    "Ready for QA",
+    "QA",
+    "Closed",
+  }
 
   vim.ui.select(transitions, {
     prompt = "Select transition:",
@@ -99,10 +91,12 @@ local function jira_transition(picker, item, action)
 
     if transition_result.code == 0 then
       vim.notify(string.format("Transitioned %s to %s", item.key, choice), vim.log.levels.INFO)
-      -- Refresh picker
       picker:refresh()
     else
-      vim.notify("Failed to transition issue", vim.log.levels.ERROR)
+      vim.notify(
+        string.format("Failed to transition %s: %s", item.key, transition_result.stderr or "Unknown error"),
+        vim.log.levels.ERROR
+      )
     end
   end)
 end
