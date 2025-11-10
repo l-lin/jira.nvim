@@ -48,7 +48,7 @@ function M.get_sprint_issues(opts, callback)
   local config = require("jira.config").options
 
   -- Build command arguments
-  local args = { "sprint", "list", "--current" }
+  local args = vim.list_extend({}, opts.cli_args or config.cli.args)
 
   -- Add filters
   local filters = opts.filters or config.query.filters

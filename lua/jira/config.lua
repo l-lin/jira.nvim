@@ -4,6 +4,7 @@ local M = {}
 M.defaults = {
   cli = {
     cmd = "jira",
+    args = { "sprint", "list", "--current" },
   },
 
   query = {
