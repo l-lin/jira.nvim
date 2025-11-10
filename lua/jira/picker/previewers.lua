@@ -44,7 +44,6 @@ local function transform_to_markdown(lines)
         end
         if title_line then
           table.insert(result, title_line)
-          table.insert(result, "")
         end
         in_header = false
       end
@@ -62,7 +61,6 @@ local function transform_to_markdown(lines)
       end
       table.insert(result, "")
       table.insert(result, "## " .. section)
-      table.insert(result, "")
     else
       -- Detect code blocks (stack traces with file paths and line numbers)
       local is_code_line = line:match("%.rb:%d+") or
