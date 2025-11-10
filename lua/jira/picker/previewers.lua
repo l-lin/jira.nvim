@@ -25,6 +25,7 @@ local function transform_to_markdown(lines)
   local in_header = true
   local in_comments_section = false
   local first_comment = true
+  local in_linked_issues_section = false
 
   for i, line in ipairs(lines) do
     -- Collect metadata and title at the beginning (first ~15 lines before sections)
@@ -75,8 +76,13 @@ local function transform_to_markdown(lines)
       if section:match("^%d+%s+Comments?$") then
         in_comments_section = true
         first_comment = true
+        in_linked_issues_section = false
+      elseif section:match("Linked Issues") then
+        in_linked_issues_section = true
+        in_comments_section = false
       else
         in_comments_section = false
+        in_linked_issues_section = false
       end
     else
       -- Detect comment author lines (Name • Date format)
@@ -103,6 +109,34 @@ local function transform_to_markdown(lines)
         end
         goto continue
       end
+
+      -- Handle linked issues section
+      if in_linked_issues_section and trimmed ~= "" then
+        -- Detect relationship type lines (all-caps words like BLOCKS, CLONES, etc.)
+        if trimmed:match("^[A-Z][A-Z%s]+$") then
+          table.insert(result, "")
+          table.insert(result, "**" .. trimmed .. ":**")
+          goto continue
+        end
+
+        -- Detect issue lines (start with issue key like INTL-94, P3C-123, etc.)
+        local issue_key = trimmed:match("^([A-Z][A-Z0-9]+-[0-9]+)")
+        if issue_key then
+          -- Parse the line: KEY Title • Metadata
+          local rest = trimmed:sub(#issue_key + 1):gsub("^%s+", "")
+          local title, metadata = rest:match("^(.-)%s*•%s*(.+)$")
+
+          if title and metadata then
+            -- Format as bullet point with bold key and italic metadata
+            table.insert(result, "- **" .. issue_key .. "**: " .. title .. " *(" .. metadata .. ")*")
+          else
+            -- Fallback if parsing fails
+            table.insert(result, "- **" .. issue_key .. "**: " .. rest)
+          end
+          goto continue
+        end
+      end
+
       -- Detect code blocks (stack traces with file paths and line numbers)
       local is_code_line = line:match("%.rb:%d+") or
                            line:match("%.py:%d+") or
