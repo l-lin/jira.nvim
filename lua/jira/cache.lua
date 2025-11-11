@@ -217,6 +217,7 @@ local M = {}
 M.get = get
 M.set = set
 M.clear = clear
+M.close = close
 M.keys = {
   ISSUES = "issues",
   EPICS = "epics",
