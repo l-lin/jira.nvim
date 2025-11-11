@@ -56,7 +56,7 @@ describe("api", function()
     package.loaded["jira.config"] = nil
   end)
 
-  describe("build_jira_args", function()
+  describe("build_sprint_list_args", function()
     it("should build basic args with default config", function()
       -- Mock config with defaults
       package.loaded["jira.config"] = {
@@ -75,7 +75,7 @@ describe("api", function()
       }
 
       api = require("jira.api")
-      local args = api.build_jira_args()
+      local args = api.build_sprint_list_args()
 
       local expected = {
         "sprint",
@@ -110,7 +110,7 @@ describe("api", function()
       }
 
       api = require("jira.api")
-      local args = api.build_jira_args()
+      local args = api.build_sprint_list_args()
 
       assert.are.equal("--status", args[4])
       assert.are.equal("In Progress", args[5])
@@ -133,7 +133,7 @@ describe("api", function()
       }
 
       api = require("jira.api")
-      local args = api.build_jira_args()
+      local args = api.build_sprint_list_args()
 
       local order_idx = nil
       for i, v in ipairs(args) do
@@ -162,7 +162,7 @@ describe("api", function()
       }
 
       api = require("jira.api")
-      local args = api.build_jira_args()
+      local args = api.build_sprint_list_args()
 
       local paginate_idx = nil
       for i, v in ipairs(args) do
@@ -191,7 +191,7 @@ describe("api", function()
       }
 
       api = require("jira.api")
-      local args = api.build_jira_args()
+      local args = api.build_sprint_list_args()
 
       local columns_idx = nil
       for i, v in ipairs(args) do
@@ -220,7 +220,7 @@ describe("api", function()
       }
 
       api = require("jira.api")
-      api.build_jira_args()
+      api.build_sprint_list_args()
 
       assert.is_true(notify_called)
       assert.is_not_nil(notify_message)
@@ -242,7 +242,7 @@ describe("api", function()
       }
 
       api = require("jira.api")
-      api.build_jira_args()
+      api.build_sprint_list_args()
 
       assert.is_false(notify_called)
     end)
@@ -262,7 +262,7 @@ describe("api", function()
       }
 
       api = require("jira.api")
-      local args = api.build_jira_args()
+      local args = api.build_sprint_list_args()
 
       assert.are.equal("sprint", args[1])
       assert.are.equal("list", args[2])
@@ -294,8 +294,70 @@ describe("api", function()
       api = require("jira.api")
 
       assert.has_error(function()
-        api.build_jira_args()
+        api.build_sprint_list_args()
       end, "JIRA CLI not found. Please install: https://github.com/ankitpokhrel/jira-cli")
+    end)
+  end)
+
+  describe("build_issue_open_args", function()
+    it("should build args for opening issue in browser", function()
+      api = require("jira.api")
+      local args = api.build_issue_open_args("PROJ-123")
+      assert.are.same({ "open", "PROJ-123" }, args)
+    end)
+  end)
+
+  describe("build_me_args", function()
+    it("should build args for getting current user", function()
+      api = require("jira.api")
+      local args = api.build_me_args()
+      assert.are.same({ "me" }, args)
+    end)
+  end)
+
+  describe("build_issue_move_args", function()
+    it("should build args for transitioning issue with status", function()
+      api = require("jira.api")
+      local args = api.build_issue_move_args("PROJ-123", "In Progress")
+      assert.are.same({ "issue", "move", "PROJ-123", "In Progress" }, args)
+    end)
+
+    it("should build args for getting transitions when status is nil", function()
+      api = require("jira.api")
+      local args = api.build_issue_move_args("PROJ-123", nil)
+      assert.are.same({ "issue", "move", "PROJ-123" }, args)
+    end)
+  end)
+
+  describe("build_issue_assign_args", function()
+    it("should build args for assigning issue to user", function()
+      api = require("jira.api")
+      local args = api.build_issue_assign_args("PROJ-123", "john.doe")
+      assert.are.same({ "issue", "assign", "PROJ-123", "john.doe" }, args)
+    end)
+  end)
+
+  describe("build_issue_unassign_args", function()
+    it("should build args for unassigning issue", function()
+      api = require("jira.api")
+      local args = api.build_issue_unassign_args("PROJ-123")
+      assert.are.same({ "issue", "assign", "PROJ-123", "x" }, args)
+    end)
+  end)
+
+  describe("build_issue_comment_args", function()
+    it("should build args for adding comment", function()
+      api = require("jira.api")
+      local args = api.build_issue_comment_args("PROJ-123", "This is a comment")
+      assert.are.same({ "issue", "comment", "add", "PROJ-123", "This is a comment" }, args)
+    end)
+  end)
+
+  describe("build_issue_edit_summary_args", function()
+    it("should build args for editing issue summary", function()
+      api = require("jira.api")
+      local args = api.build_issue_edit_summary_args("PROJ-123", "New title")
+      assert.are.same({ "issue", "edit", "PROJ-123", "--summary", "New title", "--no-input" }, args)
     end)
   end)
 end)
