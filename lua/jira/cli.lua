@@ -31,6 +31,56 @@ local function _build_sprint_list_args()
   return args
 end
 
+---Build arguments for epic list query
+---@return table args command arguments for jira CLI
+local function _build_epic_list_args()
+  local util = require("jira.util")
+  local config = require("jira.config").options
+
+  if not util.has_jira_cli() then
+    error("JIRA CLI not found. Please install: https://github.com/ankitpokhrel/jira-cli")
+  end
+
+  local args = vim.deepcopy(config.epic.args)
+
+  vim.list_extend(args, config.epic.filters)
+  vim.list_extend(args, { "--order-by", config.epic.order_by })
+  vim.list_extend(args, { "--csv", "--columns", table.concat(config.epic.columns, ",") })
+
+  if config.debug then
+    local cmd_str = config.cli.cmd .. " " .. table.concat(args, " ")
+    vim.notify("JIRA CLI Command:\n" .. cmd_str, vim.log.levels.INFO)
+  end
+
+  return args
+end
+
+---Build arguments for epic issues query
+---@param epic_key string Epic key (e.g., "PROJ-123")
+---@return table args command arguments for jira CLI
+local function _build_epic_issues_args(epic_key)
+  local util = require("jira.util")
+  local config = require("jira.config").options
+
+  if not util.has_jira_cli() then
+    error("JIRA CLI not found. Please install: https://github.com/ankitpokhrel/jira-cli")
+  end
+
+  local args = vim.deepcopy(config.epic_issues.args)
+
+  vim.list_extend(args, { "--parent", epic_key })
+  vim.list_extend(args, config.epic_issues.filters)
+  vim.list_extend(args, { "--order-by", config.epic_issues.order_by })
+  vim.list_extend(args, { "--csv", "--columns", table.concat(config.epic_issues.columns, ",") })
+
+  if config.debug then
+    local cmd_str = config.cli.cmd .. " " .. table.concat(args, " ")
+    vim.notify("JIRA CLI Command:\n" .. cmd_str, vim.log.levels.INFO)
+  end
+
+  return args
+end
+
 ---Build arguments for opening an issue in browser
 ---@param key string Issue key (e.g., "PROJ-123")
 ---@return table args command arguments
@@ -365,9 +415,24 @@ local function get_sprint_list_args()
   return _build_sprint_list_args()
 end
 
+---Get epic list arguments (for finders)
+---@return table args command arguments for epic list query
+local function get_epic_list_args()
+  return _build_epic_list_args()
+end
+
+---Get epic issues arguments (for finders)
+---@param epic_key string Epic key (e.g., "PROJ-123")
+---@return table args command arguments for epic issues query
+local function get_epic_issues_args(epic_key)
+  return _build_epic_issues_args(epic_key)
+end
+
 local M = {}
 M.execute = execute
 M.get_sprint_list_args = get_sprint_list_args
+M.get_epic_list_args = get_epic_list_args
+M.get_epic_issues_args = get_epic_issues_args
 
 -- Execute actions
 M.open_issue = open_issue

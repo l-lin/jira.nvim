@@ -24,6 +24,8 @@
 ---@class jira.Config
 ---@field cli jira.CliConfig CLI settings
 ---@field query jira.QueryConfig Query settings
+---@field epic jira.QueryConfig Epic query settings
+---@field epic_issues jira.QueryConfig Epic issues query settings
 ---@field display jira.DisplayConfig Display settings
 ---@field keymaps jira.Keymaps Custom keymaps
 ---@field debug boolean Enable debug mode to print CLI commands

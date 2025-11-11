@@ -17,6 +17,24 @@ M.defaults = {
     prefill_search = "",
   },
 
+  -- Configuration for listing epics
+  epic = {
+    args = { "issue", "list", "--type", "Epic" },
+    columns = { "key", "summary", "status" },
+    filters = { "-s~done", "-s~closed", "-s~archive" },
+    order_by = "created",
+    prefill_search = "",
+  },
+
+  -- Configuration for fetching issues within an epic
+  epic_issues = {
+    args = { "issue", "list" },
+    columns = { "type", "key", "assignee", "status", "summary", "labels" },
+    filters = { "-s~archive", "-s~done" },
+    order_by = "status",
+    prefill_search = "",
+  },
+
   display = {
     -- Icons displayed for each issue type
     type_icons = {

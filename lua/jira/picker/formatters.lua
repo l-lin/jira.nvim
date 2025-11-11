@@ -82,7 +82,41 @@ local function format_jira_action(item, picker)
   return ret
 end
 
+---Format epic item for display in epic picker
+---@param item snacks.picker.Item
+---@param picker snacks.Picker
+---@return snacks.picker.Highlight[]
+local function format_jira_epics(item, picker)
+  local ret = {}
+  local config = require("jira.config").options
+
+  -- Epic icon
+  local type_icons = config.display.type_icons
+  local icon = type_icons.Epic or type_icons.default
+  local type_highlights = config.display.type_highlights
+  local type_hl = type_highlights.Epic or "Comment"
+  table.insert(ret, { icon .. " ", type_hl })
+
+  -- Epic key
+  local issue_hl = config.display.issue_highlights
+  table.insert(ret, { pad_to_width(item.key or "", 10), issue_hl.key })
+  table.insert(ret, { " " })
+
+  -- Status
+  local status = item.status or "Unknown"
+  local status_highlights = config.display.status_highlights
+  local status_hl = status_highlights[status] or "Comment"
+  table.insert(ret, { pad_to_width(status, 13), status_hl })
+  table.insert(ret, { " " })
+
+  -- Summary
+  table.insert(ret, { item.summary or "", issue_hl.summary })
+
+  return ret
+end
+
 local M = {}
 M.format_jira_issues = format_jira_issues
 M.format_jira_action = format_jira_action
+M.format_jira_epics = format_jira_epics
 return M
