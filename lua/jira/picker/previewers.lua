@@ -29,6 +29,11 @@ local function preview_jira_issue(ctx)
 
   -- Execute command asynchronously
   vim.system(cmd, { text = true }, vim.schedule_wrap(function(result)
+    -- Validate preview is still valid
+    if not ctx.preview.win:buf_valid() then
+      return
+    end
+
     if result.code ~= 0 then
       ctx.preview:reset()
       ctx.preview:set_title(item.key)
