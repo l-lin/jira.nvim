@@ -24,12 +24,13 @@ local function format_jira_issues(item, picker)
   table.insert(ret, { icon .. " ", type_hl })
 
   -- Issue key (compact)
-  table.insert(ret, { pad_to_width(item.key or "", 10), "Special" })
+  local issue_hl = config.display.issue_highlights
+  table.insert(ret, { pad_to_width(item.key or "", 10), issue_hl.key })
   table.insert(ret, { " " })
 
   -- Assignee (compact)
   local assignee = (item.assignee and item.assignee ~= "") and item.assignee or "Unassigned"
-  table.insert(ret, { pad_to_width(assignee, 18), "Identifier" })
+  table.insert(ret, { pad_to_width(assignee, 18), issue_hl.assignee })
   table.insert(ret, { " " })
 
   -- Status badge (compact)
@@ -40,17 +41,17 @@ local function format_jira_issues(item, picker)
   table.insert(ret, { " " })
 
   -- Summary (main text) - no width constraint
-  table.insert(ret, { item.summary or "", "Normal" })
+  table.insert(ret, { item.summary or "", issue_hl.summary })
 
   -- Labels (if present, more compact)
   if item.labels and item.labels ~= "" then
-    table.insert(ret, { " ", "Comment" })
+    table.insert(ret, { " ", issue_hl.labels })
     local labels = vim.split(item.labels, ",")
     for i = 1, #labels do
       if i > 1 then
-        table.insert(ret, { " ", "Comment" })
+        table.insert(ret, { " ", issue_hl.labels })
       end
-      table.insert(ret, { "#" .. labels[i], "Comment" })
+      table.insert(ret, { "#" .. labels[i], issue_hl.labels })
     end
   end
 
@@ -63,18 +64,19 @@ end
 ---@return snacks.picker.Highlight[]
 local function format_jira_action(item, picker)
   local ret = {}
+  local config = require("jira.config").options
+  local action_hl = config.display.action_highlights
 
   -- Format: "icon  number. description" (two spaces after icon)
   local icon, num, rest = item.text:match("^([^%s]+)%s+(%d+%.%s)(.*)$")
 
   if icon and num and rest then
-    table.insert(ret, { icon .. "  ", "Special" })
-    table.insert(ret, { num, "Number" })
-    -- Description (no highlight group = use default picker text highlight)
-    table.insert(ret, { rest })
+    table.insert(ret, { icon .. "  ", action_hl.icon })
+    table.insert(ret, { num, action_hl.number })
+    table.insert(ret, { rest, action_hl.description })
   else
     -- Fallback if format doesn't match
-    table.insert(ret, { item.text, "Normal" })
+    table.insert(ret, { item.text, action_hl.fallback })
   end
 
   return ret

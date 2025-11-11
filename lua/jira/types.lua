@@ -12,6 +12,8 @@
 ---@field type_icons table<string, string> Icons for issue types
 ---@field type_highlights table<string, string> Highlight groups for issue types
 ---@field status_highlights table<string, string> Highlight groups for statuses
+---@field issue_highlights table<string, string> Highlight groups for issue fields (key, assignee, summary, labels)
+---@field action_highlights table<string, string> Highlight groups for action dialog (icon, number, description, fallback)
 ---@field preview_comments number Number of comments to show in preview (default: 0)
 
 ---@class jira.KeymapsInput

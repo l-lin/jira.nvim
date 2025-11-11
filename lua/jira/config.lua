@@ -38,6 +38,18 @@ M.defaults = {
       ["Awaiting Information"] = "Comment",
       ["Triage"] = "DiagnosticInfo",
     },
+    issue_highlights = {
+      key = "Identifier",
+      assignee = "Identifier",
+      summary = "Identifier",
+      labels = "Comment",
+    },
+    action_highlights = {
+      icon = "Special",
+      number = "Number",
+      description = "Normal",
+      fallback = "Normal",
+    },
     preview_comments = 10,
   },
 
