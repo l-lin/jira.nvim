@@ -260,31 +260,28 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function action_jira_comment(picker, item, action)
+local function action_jira_add_comment(picker, item, action)
   if not item.key then
     vim.notify("No issue key available", vim.log.levels.WARN)
     return
   end
 
-  local issue_key = item.key
-  local parent = picker.win and picker.win.win or vim.api.nvim_get_current_win()
-
   Snacks.scratch({
     ft = "markdown",
-    name = string.format("Comment on %s", issue_key),
+    name = string.format("Comment on %s", item.key),
     template = "",
     win = {
       relative = "editor",
       width = 80,
       height = 15,
-      title = string.format(" Add Comment to %s ", issue_key),
+      title = string.format(" Add Comment to %s ", item.key),
       title_pos = "center",
       border = "rounded",
       keys = {
         submit = {
           "<c-s>",
           function(win)
-            submit_comment(issue_key, win)
+            submit_comment(item.key, win)
           end,
           desc = "Submit comment",
           mode = { "n", "i" },
@@ -345,7 +342,7 @@ local function get_jira_actions(item, ctx)
       name = "Add comment",
       icon = " ",
       priority = 50,
-      action = action_jira_comment,
+      action = action_jira_add_comment,
     },
   }
 end
@@ -388,5 +385,5 @@ M.action_jira_copy_key = action_jira_copy_key
 M.action_jira_transition = action_jira_transition
 M.action_jira_assign_me = action_jira_assign_me
 M.action_jira_unassign = action_jira_unassign
-M.action_jira_comment = action_jira_comment
+M.action_jira_add_comment = action_jira_add_comment
 return M
