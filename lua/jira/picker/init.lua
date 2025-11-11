@@ -22,7 +22,12 @@ local function register()
   -- Register sources
   local sources = require("jira.picker.sources")
   for name, source in pairs(sources) do
-    snacks.picker.sources[name] = source
+    -- Only register source configs (tables), skip factory functions
+    -- Factory functions like source_jira_epic_issues(epic_key) need parameters
+    -- and would cause fix_keys to fail when it tries to index them
+    if type(source) == "table" then
+      snacks.picker.sources[name] = source
+    end
   end
 end
 
