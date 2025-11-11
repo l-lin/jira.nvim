@@ -102,24 +102,6 @@ describe("cli", function()
       assert.are.same({ "jira", "issue", "view", "PROJ-123" }, system_cmd)
     end)
 
-    it("should include cli.args after command if configured", function()
-      package.loaded["jira.config"] = {
-        options = {
-          cli = {
-            cmd = "jira",
-            args = { "--project", "TEST" },
-          },
-          debug = false,
-        },
-      }
-
-      cli = require("jira.cli")
-      cli.execute({ "issue", "list" })
-
-      assert.is_true(system_called)
-      assert.are.same({ "jira", "--project", "TEST", "issue", "list" }, system_cmd)
-    end)
-
     it("should call vim.notify with debug message when debug is enabled", function()
       package.loaded["jira.config"].options.debug = true
 
