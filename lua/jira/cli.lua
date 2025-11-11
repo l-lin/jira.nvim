@@ -372,7 +372,7 @@ end
 local function get_transitions(issue_key, callback)
   local config = require("jira.config").options
 
-  -- Note: jira-cli doesn't provide a non-interactive way to list transitions,
+  -- NOTE: jira-cli doesn't provide a non-interactive way to list transitions,
   -- so we scrape the interactive prompt output by spawning the command,
   -- capturing stdout, then killing it before it waits for user input
   local stdout_chunks = {}
@@ -387,7 +387,7 @@ local function get_transitions(issue_key, callback)
         end
       end
     end,
-    on_exit = function(_, code, _)
+    on_exit = function()
       -- Process terminated, parse output
       local output = table.concat(stdout_chunks, "\n")
 

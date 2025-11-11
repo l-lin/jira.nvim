@@ -237,8 +237,53 @@ local function get_jira_epic_issues(epic_key, opts, ctx)
   )(opts, ctx)
 end
 
+---Gets the available actions for a JIRA issue and formats them for display in a picker.
+---@param opts snacks.picker.finder_opts Options passed to the finder
+---@param ctx snacks.picker.finder_context Context for the finder
+local function get_actions(opts, ctx)
+  local item = opts.item or (ctx.ctx and ctx.ctx.item) or ctx.item
+
+  local actions = require("jira.picker.actions").get_jira_actions(item, ctx)
+
+  local items = {}
+  for name, action_def in pairs(actions) do
+    table.insert(items, {
+      text = string.format("%s %s", action_def.icon or "", action_def.name),
+      name = name,
+      desc = action_def.desc,
+      action = action_def,
+      priority = action_def.priority or 0,
+    })
+  end
+
+  -- Sort by priority (highest first), then by name
+  table.sort(items, function(a, b)
+    if a.priority ~= b.priority then
+      return a.priority > b.priority
+    end
+    return a.name < b.name
+  end)
+
+  ---@async
+  return function(cb)
+    for i = 1, #items do
+      local it = items[i]
+      -- Extract icon from the beginning of text (emoji followed by space)
+      local icon, rest = it.text:match("^([^%s]+)%s(.+)$")
+      if icon and rest then
+        it.text = ("%s  %d. %s"):format(icon, i, rest)
+      else
+        it.text = ("%d. %s"):format(i, it.text)
+      end
+      cb(it)
+    end
+  end
+end
+
+
 local M = {}
 M.get_jira_issues = get_jira_issues
 M.get_jira_epics = get_jira_epics
 M.get_jira_epic_issues = get_jira_epic_issues
+M.get_actions = get_actions
 return M
