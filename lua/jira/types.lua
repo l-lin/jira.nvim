@@ -27,10 +27,10 @@
 ---@field preview table<string, string|snacks.win.Keys> Keymaps for preview window
 
 ---@class jira.LayoutConfig
----@field issues table Layout configuration for issues picker
----@field epic_issues table Layout configuration for epic issues picker
----@field epics table Layout configuration for epics picker
----@field actions table Layout configuration for actions picker
+---@field issues table? Layout configuration for issues picker
+---@field epic_issues table? Layout configuration for epic issues picker
+---@field epics table? Layout configuration for epics picker
+---@field actions table? Layout configuration for actions picker
 
 ---@class jira.CacheConfig
 ---@field enabled boolean Enable/disable caching of JIRA query results

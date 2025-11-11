@@ -34,10 +34,11 @@ local defaults = {
   },
 
   -- Layout configuration for pickers
+  -- Set to `nil` to use the default layout.
   -- Use `:help snacks.nvim-picker-layouts` for more customization
   layout = {
-    issues = { preset = "vertical" },
-    epic_issues = { preset = "vertical" },
+    issues = nil,
+    epic_issues = nil,
     epics = { preset = "select", layout = { max_width = 120 } },
     actions = { preset = "select", layout = { max_width = 60 } },
   },
