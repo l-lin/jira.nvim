@@ -296,6 +296,49 @@ local function action_jira_add_comment(picker, item, action)
   })
 end
 
+--- Edit issue title
+---@param picker snacks.Picker
+---@param item snacks.picker.Item
+---@param action snacks.picker.Action
+local function action_jira_edit_title(picker, item, action)
+  if not item.key then
+    vim.notify("No issue key available", vim.log.levels.WARN)
+    return
+  end
+
+  local current_title = item.summary or ""
+
+  vim.ui.input({ prompt = "Edit title: ", default = current_title }, function(new_title)
+    if not new_title or new_title == "" then
+      return
+    end
+
+    -- Skip if title unchanged
+    if new_title == current_title then
+      return
+    end
+
+    local config = require("jira.config").options
+    local cmd = { config.cli.cmd, "issue", "edit", item.key, "--summary", new_title, "--no-input" }
+
+    if config.debug then
+      vim.notify("JIRA CLI Command:\n" .. table.concat(cmd, " "), vim.log.levels.INFO)
+    end
+
+    local result = vim.system(cmd, { text = true }):wait()
+
+    if result.code == 0 then
+      vim.notify(string.format("Updated title for %s", item.key), vim.log.levels.INFO)
+      picker:refresh()
+    else
+      vim.notify(
+        string.format("Failed to update title for %s: %s", item.key, result.stderr or "Unknown error"),
+        vim.log.levels.ERROR
+      )
+    end
+  end)
+end
+
 --- Define all actions with metadata
 --- Get available actions for an item
 ---@param item snacks.picker.Item
@@ -336,6 +379,13 @@ local function get_jira_actions(item, ctx)
       icon = " ",
       priority = 60,
       action = action_jira_unassign,
+    },
+
+    edit_title = {
+      name = "Edit title",
+      icon = "󰏫 ",
+      priority = 55,
+      action = action_jira_edit_title,
     },
 
     comment = {
