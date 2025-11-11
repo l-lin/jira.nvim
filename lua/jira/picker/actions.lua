@@ -329,6 +329,15 @@ local function action_jira_edit_description(picker, item, action)
   end)
 end
 
+---Refresh picker and clear cache
+---@param picker snacks.Picker
+---@param item snacks.picker.Item
+---@param action snacks.picker.Action
+local function action_jira_refresh_cache(picker, item, action)
+  require("jira.cache").clear()
+  picker:refresh()
+end
+
 ---Define all actions with metadata
 ---Get available actions for an item
 ---@param item snacks.picker.Item
@@ -391,16 +400,14 @@ local function get_jira_actions(item, ctx)
       priority = 30,
       action = action_jira_add_comment,
     },
-  }
-end
 
----Refresh picker and clear cache
----@param picker snacks.Picker
----@param item snacks.picker.Item
----@param action snacks.picker.Action
-local function action_jira_refresh_cache(picker, item, action)
-  require("jira.cache").clear()
-  picker:refresh()
+    refresh = {
+      name = "Refresh",
+      icon = " ",
+      priority = 20,
+      action = action_jira_refresh_cache,
+    },
+  }
 end
 
 ---Action to show action dialog
