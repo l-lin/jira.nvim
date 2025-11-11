@@ -7,7 +7,7 @@ M.defaults = {
     cmd = "jira",
 
     -- Configuration for fetching current sprint issues
-    query = {
+    issues = {
       args = { "sprint", "list", "--current" },
       columns = { "type", "key", "assignee", "status", "summary", "labels" },
       filters = { "-s~archive", "-s~done" },
@@ -17,7 +17,7 @@ M.defaults = {
     },
 
     -- Configuration for listing epics
-    epic = {
+    epics = {
       args = { "issue", "list", "--type", "Epic" },
       columns = { "key", "summary", "status" },
       filters = { "-s~done", "-s~closed", "-s~archive" },

@@ -17,11 +17,11 @@ local function _build_sprint_list_args()
     error("JIRA CLI not found. Please install: https://github.com/ankitpokhrel/jira-cli")
   end
 
-  local args = vim.deepcopy(config.cli.query.args)
+  local args = vim.deepcopy(config.cli.issues.args)
 
-  vim.list_extend(args, config.cli.query.filters)
-  vim.list_extend(args, { "--order-by", config.cli.query.order_by })
-  vim.list_extend(args, { "--csv", "--columns", table.concat(config.cli.query.columns, ",") })
+  vim.list_extend(args, config.cli.issues.filters)
+  vim.list_extend(args, { "--order-by", config.cli.issues.order_by })
+  vim.list_extend(args, { "--csv", "--columns", table.concat(config.cli.issues.columns, ",") })
 
   if config.debug then
     local cmd_str = config.cli.cmd .. " " .. table.concat(args, " ")
@@ -41,11 +41,11 @@ local function _build_epic_list_args()
     error("JIRA CLI not found. Please install: https://github.com/ankitpokhrel/jira-cli")
   end
 
-  local args = vim.deepcopy(config.cli.epic.args)
+  local args = vim.deepcopy(config.cli.epics.args)
 
-  vim.list_extend(args, config.cli.epic.filters)
-  vim.list_extend(args, { "--order-by", config.cli.epic.order_by })
-  vim.list_extend(args, { "--csv", "--columns", table.concat(config.cli.epic.columns, ",") })
+  vim.list_extend(args, config.cli.epics.filters)
+  vim.list_extend(args, { "--order-by", config.cli.epics.order_by })
+  vim.list_extend(args, { "--csv", "--columns", table.concat(config.cli.epics.columns, ",") })
 
   if config.debug then
     local cmd_str = config.cli.cmd .. " " .. table.concat(args, " ")
