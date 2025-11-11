@@ -1,8 +1,6 @@
-local M = {}
-
 --- Setup plugin with user configuration
 ---@param opts jira.Config?
-function M.setup(opts)
+local function setup(opts)
   require("jira.config").setup(opts)
 
   -- Register with snacks.picker if available
@@ -13,7 +11,7 @@ end
 
 --- Open issues picker
 ---@param opts table? Picker options
-function M.issues(opts)
+local function issues(opts)
   if not package.loaded["snacks"] then
     vim.notify("jira.nvim requires snacks.nvim", vim.log.levels.ERROR)
     return
@@ -27,4 +25,7 @@ function M.issues(opts)
   return require("snacks").picker("jira_issues", opts)
 end
 
+local M = {}
+M.setup = setup
+M.issues = issues
 return M

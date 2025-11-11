@@ -217,12 +217,6 @@ end
 local function submit_description(issue_key, win, picker)
   local description = win:text()
 
-  -- Validate non-empty description
-  if not description or description:match("^%s*$") then
-    vim.notify("Description cannot be empty", vim.log.levels.WARN)
-    return
-  end
-
   cli.edit_issue_description(issue_key, description, {
     progress_msg = string.format("Updating description for %s...", issue_key),
     success_msg = string.format("Updated description for %s", issue_key),
