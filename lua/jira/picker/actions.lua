@@ -190,7 +190,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function action_jira_edit_title(picker, item, action)
+local function action_jira_edit_summary(picker, item, action)
   if not validate_item_key(item) then
     return
   end
@@ -207,9 +207,9 @@ local function action_jira_edit_title(picker, item, action)
       return
     end
 
-    cli.edit_issue_title(item.key, new_title, {
-      success_msg = string.format("Updated title for %s", item.key),
-      error_msg = string.format("Failed to update title for %s", item.key),
+    cli.edit_issue_summary(item.key, new_title, {
+      success_msg = string.format("Updated summary for %s", item.key),
+      error_msg = string.format("Failed to update summary for %s", item.key),
       on_success = function()
         picker:refresh()
       end,
@@ -326,11 +326,11 @@ local function get_jira_actions(item, ctx)
       action = action_jira_unassign,
     },
 
-    edit_title = {
-      name = "Edit title",
+    edit_summary = {
+      name = "Edit summary/title",
       icon = "󰏫 ",
       priority = 50,
-      action = action_jira_edit_title,
+      action = action_jira_edit_summary,
     },
 
     edit_description = {

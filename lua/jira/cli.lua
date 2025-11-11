@@ -233,7 +233,7 @@ end
 ---@param key string Issue key
 ---@param summary string New summary/title
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
-local function edit_issue_title(key, summary, opts)
+local function edit_issue_summary(key, summary, opts)
   execute(_build_issue_edit_summary_args(key, summary), opts)
 end
 
@@ -376,7 +376,7 @@ M.transition_issue = transition_issue
 M.assign_issue = assign_issue
 M.unassign_issue = unassign_issue
 M.comment_issue = comment_issue
-M.edit_issue_title = edit_issue_title
+M.edit_issue_summary = edit_issue_summary
 M.view_issue = view_issue
 M.view_issue_description = view_issue_description
 M.edit_issue_description = edit_issue_description

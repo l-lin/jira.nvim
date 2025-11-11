@@ -58,13 +58,13 @@ local function source_jira_issues()
     win = {
       input = {
         title = "JIRA Issues (Current Sprint)",
+        keys = keymaps.input,
       },
       list = {
-        keys = {
-          [keymaps.list.actions] = "action_jira_list_actions",
-          [keymaps.list.copy_key] = "action_jira_copy_key",
-          [keymaps.list.transition] = "action_jira_transition",
-        },
+        keys = keymaps.list,
+      },
+      preview = {
+        keys = keymaps.preview,
       },
     },
   }

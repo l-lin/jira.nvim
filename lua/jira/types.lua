@@ -16,18 +16,10 @@
 ---@field action_highlights table<string, string> Highlight groups for action dialog (icon, number, description, fallback)
 ---@field preview_comments number Number of comments to show in preview (default: 0)
 
----@class jira.KeymapsInput
----@field copy_key string Keymap to copy issue key in input mode
----@field transition string Keymap to transition issue in input mode
-
----@class jira.KeymapsList
----@field actions string Keymap to open actions dialog in list mode
----@field copy_key string Keymap to copy issue key in list mode
----@field transition string Keymap to transition issue in list mode
-
 ---@class jira.Keymaps
----@field input jira.KeymapsInput Keymaps for input focus mode
----@field list jira.KeymapsList Keymaps for list focus mode
+---@field input table<string, string|snacks.win.Keys> Keymaps for input window
+---@field list table<string, string|snacks.win.Keys> Keymaps for list window
+---@field preview table<string, string|snacks.win.Keys> Keymaps for preview window
 
 ---@class jira.Config
 ---@field cli jira.CliConfig CLI settings
