@@ -99,6 +99,7 @@ M.defaults = {
       ["<M-y>"] = { "action_jira_copy_key", mode = { "i", "n" } },
       ["<M-m>"] = { "action_jira_transition", mode = { "i", "n" } },
       ["<M-c>"] = { "action_jira_add_comment", mode = { "i", "n" } },
+      ["<M-r>"] = { "action_jira_refresh_cache", mode = { "i", "n" } },
     },
     -- Keymaps on Snacks list window
     list = {
@@ -106,12 +107,21 @@ M.defaults = {
       ["y"] = "action_jira_copy_key",
       ["gt"] = "action_jira_transition",
       ["gc"] = "action_jira_add_comment",
+      ["<M-r>"] = "action_jira_refresh_cache",
     },
     -- Keymaps on Snacks preview window
     preview = {
       ["<CR>"] = "action_jira_list_actions",
       ["<M-c>"] = "action_jira_add_comment",
     },
+  },
+
+  -- Cache configuration
+  cache = {
+    -- Enable/disable caching of JIRA query results
+    enabled = true,
+    -- Path to cache database (defaults to Neovim data directory)
+    -- path = vim.fn.stdpath("data") .. "/jira/cache.sqlite3",
   },
 
   -- Flag to enable/disable debug logging

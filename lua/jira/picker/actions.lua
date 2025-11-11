@@ -76,6 +76,10 @@ local function action_jira_transition(picker, item, _)
         success_msg = string.format("Transitioned %s to %s", item.key, choice),
         error_msg = string.format("Failed to transition %s", item.key),
         on_success = function()
+          -- Clear cache for issue queries
+          local cache = require("jira.cache")
+          cache.clear_pattern("issues%")
+          cache.clear_pattern("epic_issues%")
           picker:refresh()
         end,
       })
@@ -103,6 +107,10 @@ local function action_jira_assign_me(picker, item, action)
         success_msg = string.format("Assigned %s to you", item.key),
         error_msg = string.format("Failed to assign %s", item.key),
         on_success = function()
+          -- Clear cache for issue queries
+          local cache = require("jira.cache")
+          cache.clear_pattern("issues%")
+          cache.clear_pattern("epic_issues%")
           picker:refresh()
         end,
       })
@@ -123,6 +131,10 @@ local function action_jira_unassign(picker, item, action)
     success_msg = string.format("Unassigned %s", item.key),
     error_msg = string.format("Failed to unassign %s", item.key),
     on_success = function()
+      -- Clear cache for issue queries
+      local cache = require("jira.cache")
+      cache.clear_pattern("issues%")
+      cache.clear_pattern("epic_issues%")
       picker:refresh()
     end,
   })
@@ -211,6 +223,10 @@ local function action_jira_edit_summary(picker, item, action)
       success_msg = string.format("Updated summary for %s", item.key),
       error_msg = string.format("Failed to update summary for %s", item.key),
       on_success = function()
+        -- Clear cache for issue queries
+        local cache = require("jira.cache")
+        cache.clear_pattern("issues%")
+        cache.clear_pattern("epic_issues%")
         picker:refresh()
       end,
     })
@@ -229,6 +245,10 @@ local function submit_description(issue_key, win, picker)
     success_msg = string.format("Updated description for %s", issue_key),
     error_msg = string.format("Failed to update description for %s", issue_key),
     on_success = function()
+      -- Clear cache for issue queries
+      local cache = require("jira.cache")
+      cache.clear_pattern("issues%")
+      cache.clear_pattern("epic_issues%")
       win:close()
       picker:refresh()
     end,
@@ -349,6 +369,24 @@ local function get_jira_actions(item, ctx)
   }
 end
 
+---Refresh picker and clear cache
+---@param picker snacks.Picker
+---@param item snacks.picker.Item
+---@param action snacks.picker.Action
+local function action_jira_refresh_cache(picker, item, action)
+  local cache = require("jira.cache")
+
+  -- Clear all caches
+  cache.clear()
+
+  -- Refresh picker with skip_cache flag
+  -- Note: snacks picker doesn't directly support passing opts to refresh
+  -- So we clear cache first, then refresh normally
+  picker:refresh()
+
+  vim.notify("Cache cleared and refreshed", vim.log.levels.INFO)
+end
+
 ---Action to show action dialog
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
@@ -387,4 +425,5 @@ M.action_jira_transition = action_jira_transition
 M.action_jira_assign_me = action_jira_assign_me
 M.action_jira_unassign = action_jira_unassign
 M.action_jira_add_comment = action_jira_add_comment
+M.action_jira_refresh_cache = action_jira_refresh_cache
 return M

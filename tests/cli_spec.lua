@@ -273,13 +273,14 @@ describe("cli", function()
         options = {
           cli = {
             cmd = "jira",
+            issues = {
+              args = { "sprint", "list", "--current" },
+              filters = { "--assignee", "me" },
+              order_by = "created",
+              columns = { "key", "summary", "status" },
+            },
           },
-          query = {
-            args = { "sprint", "list", "--current" },
-            filters = { "--assignee", "me" },
-            order_by = "created",
-            columns = { "key", "summary", "status" },
-          },
+          cache = { enabled = true },
           debug = false,
         },
       }
@@ -306,13 +307,16 @@ describe("cli", function()
     it("should handle custom filters", function()
       package.loaded["jira.config"] = {
         options = {
-          cli = { cmd = "jira" },
-          query = {
-            args = { "sprint", "list", "--current" },
-            filters = { "--status", "In Progress", "--priority", "High" },
-            order_by = "updated",
-            columns = { "key", "summary" },
+          cli = {
+            cmd = "jira",
+            issues = {
+              args = { "sprint", "list", "--current" },
+              filters = { "--status", "In Progress", "--priority", "High" },
+              order_by = "updated",
+              columns = { "key", "summary" },
+            },
           },
+          cache = { enabled = true },
           debug = false,
         },
       }
@@ -329,13 +333,16 @@ describe("cli", function()
     it("should handle custom order_by", function()
       package.loaded["jira.config"] = {
         options = {
-          cli = { cmd = "jira" },
-          query = {
-            args = { "sprint", "list", "--current" },
-            filters = {},
-            order_by = "priority",
-            columns = { "key" },
+          cli = {
+            cmd = "jira",
+            issues = {
+              args = { "sprint", "list", "--current" },
+              filters = {},
+              order_by = "priority",
+              columns = { "key" },
+            },
           },
+          cache = { enabled = true },
           debug = false,
         },
       }
@@ -358,13 +365,16 @@ describe("cli", function()
     it("should handle custom columns", function()
       package.loaded["jira.config"] = {
         options = {
-          cli = { cmd = "jira" },
-          query = {
-            args = { "sprint", "list", "--current" },
-            filters = {},
-            order_by = "created",
-            columns = { "key", "summary", "assignee", "priority" },
+          cli = {
+            cmd = "jira",
+            issues = {
+              args = { "sprint", "list", "--current" },
+              filters = {},
+              order_by = "created",
+              columns = { "key", "summary", "assignee", "priority" },
+            },
           },
+          cache = { enabled = true },
           debug = false,
         },
       }
@@ -387,13 +397,16 @@ describe("cli", function()
     it("should call vim.notify when debug is enabled", function()
       package.loaded["jira.config"] = {
         options = {
-          cli = { cmd = "jira" },
-          query = {
-            args = { "sprint", "list", "--current" },
-            filters = {},
-            order_by = "created",
-            columns = { "key" },
+          cli = {
+            cmd = "jira",
+            issues = {
+              args = { "sprint", "list", "--current" },
+              filters = {},
+              order_by = "created",
+              columns = { "key" },
+            },
           },
+          cache = { enabled = true },
           debug = true,
         },
       }
@@ -409,13 +422,16 @@ describe("cli", function()
     it("should not call vim.notify when debug is disabled", function()
       package.loaded["jira.config"] = {
         options = {
-          cli = { cmd = "jira" },
-          query = {
-            args = { "sprint", "list", "--current" },
-            filters = {},
-            order_by = "created",
-            columns = { "key" },
+          cli = {
+            cmd = "jira",
+            issues = {
+              args = { "sprint", "list", "--current" },
+              filters = {},
+              order_by = "created",
+              columns = { "key" },
+            },
           },
+          cache = { enabled = true },
           debug = false,
         },
       }
@@ -429,13 +445,16 @@ describe("cli", function()
     it("should handle empty filters", function()
       package.loaded["jira.config"] = {
         options = {
-          cli = { cmd = "jira" },
-          query = {
-            args = { "sprint", "list", "--current" },
-            filters = {},
-            order_by = "created",
-            columns = { "key" },
+          cli = {
+            cmd = "jira",
+            issues = {
+              args = { "sprint", "list", "--current" },
+              filters = {},
+              order_by = "created",
+              columns = { "key" },
+            },
           },
+          cache = { enabled = true },
           debug = false,
         },
       }
@@ -459,13 +478,16 @@ describe("cli", function()
 
       package.loaded["jira.config"] = {
         options = {
-          cli = { cmd = "jira" },
-          query = {
-            args = { "sprint", "list", "--current" },
-            filters = {},
-            order_by = "created",
-            columns = { "key" },
+          cli = {
+            cmd = "jira",
+            issues = {
+              args = { "sprint", "list", "--current" },
+              filters = {},
+              order_by = "created",
+              columns = { "key" },
+            },
           },
+          cache = { enabled = true },
           debug = false,
         },
       }

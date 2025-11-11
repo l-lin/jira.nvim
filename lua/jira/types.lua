@@ -32,10 +32,15 @@
 ---@field epics table Layout configuration for epics picker
 ---@field actions table Layout configuration for actions picker
 
+---@class jira.CacheConfig
+---@field enabled boolean Enable/disable caching of JIRA query results
+---@field path? string Path to cache database (defaults to Neovim data directory)
+
 ---@class jira.Config
 ---@field cli jira.CliConfig CLI settings
 ---@field ui jira.UIConfig UI settings
 ---@field layout jira.LayoutConfig Layout settings
 ---@field preview jira.PreviewConfig Preview settings
 ---@field keymaps jira.Keymaps Custom keymaps
+---@field cache jira.CacheConfig Cache settings
 ---@field debug boolean Enable debug mode to print CLI commands
