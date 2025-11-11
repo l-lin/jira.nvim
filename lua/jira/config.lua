@@ -95,7 +95,7 @@ local defaults = {
     -- Keymaps on Snacks input window
     input = {
       ["<M-y>"] = { "action_jira_copy_key", mode = { "i", "n" } },
-      ["<M-m>"] = { "action_jira_transition", mode = { "i", "n" } },
+      ["<M-t>"] = { "action_jira_transition", mode = { "i", "n" } },
       ["<M-c>"] = { "action_jira_add_comment", mode = { "i", "n" } },
       ["<M-r>"] = { "action_jira_refresh_cache", mode = { "i", "n" } },
     },
@@ -111,7 +111,7 @@ local defaults = {
     preview = {
       ["<CR>"] = "action_jira_list_actions",
       ["<M-y>"] = "action_jira_copy_key",
-      ["<M-m>"] = "action_jira_transition",
+      ["<M-t>"] = "action_jira_transition",
       ["<M-c>"] = "action_jira_add_comment",
     },
   },
