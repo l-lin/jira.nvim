@@ -123,14 +123,11 @@ local function action_jira_assign_me(picker, item, action)
     return
   end
 
-  -- First get current user, then assign
   cli.get_current_user({
-    progress_msg = "Getting current user...",
     error_msg = "Failed to get current user",
     on_success = function(result)
       local me = vim.trim(result.stdout or "")
       cli.assign_issue(item.key, me, {
-        progress_msg = string.format("Assigning %s...", item.key),
         success_msg = string.format("Assigned %s to you", item.key),
         error_msg = string.format("Failed to assign %s", item.key),
         on_success = function()
@@ -267,7 +264,6 @@ local function submit_description(issue_key, win, picker)
   local description = win:text()
 
   cli.edit_issue_description(issue_key, description, {
-    progress_msg = string.format("Updating description for %s...", issue_key),
     success_msg = string.format("Updated description for %s", issue_key),
     error_msg = string.format("Failed to update description for %s", issue_key),
     on_success = function()
@@ -289,17 +285,12 @@ local function action_jira_edit_description(picker, item, action)
     return
   end
 
-  -- Show loading notification
-  vim.notify(string.format("Fetching description for %s...", item.key), vim.log.levels.INFO)
-
-  -- Fetch current description
-  cli.view_issue_description(item.key, function(description)
+  cli.get_issue_description(item.key, function(description)
     if not description then
       vim.notify(string.format("Failed to fetch description for %s", item.key), vim.log.levels.ERROR)
       return
     end
 
-    -- Open scratch buffer with current description
     Snacks.scratch({
       ft = "markdown",
       name = string.format("Edit Description - %s", item.key),

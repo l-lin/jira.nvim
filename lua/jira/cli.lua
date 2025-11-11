@@ -187,14 +187,8 @@ local function execute(args, opts)
   local cmd = { config.cli.cmd }
   vim.list_extend(cmd, args)
 
-  -- Debug logging
   if config.debug then
     vim.notify("JIRA CLI Command:\n" .. table.concat(cmd, " "), vim.log.levels.INFO)
-  end
-
-  -- Show progress notification
-  if opts.progress_msg then
-    vim.notify(opts.progress_msg, vim.log.levels.INFO)
   end
 
   -- Prepare system options
