@@ -23,6 +23,15 @@ local function display_result(ctx, result)
 
   -- Set markdown filetype for syntax highlighting
   vim.bo[ctx.preview.win.buf].filetype = "markdown"
+
+  -- Trigger render-markdown if available
+  if package.loaded["render-markdown"] then
+    require("render-markdown").render({
+      buf = ctx.preview.win.buf,
+      event = "JiraPreview",
+      config = { render_modes = true },
+    })
+  end
 end
 
 ---@param ctx snacks.picker.preview.ctx
