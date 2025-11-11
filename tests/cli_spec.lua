@@ -20,12 +20,15 @@ if not _G.vim then
       return copy
     end,
     notify = function() end,
-    system = function()
-      return {
-        wait = function()
-          return { code = 0, stdout = "", stderr = "" }
-        end,
-      }
+    system = function(cmd, opts, callback)
+      -- Async mode - call callback immediately
+      if callback then
+        callback({ code = 0, stdout = "", stderr = "" })
+      end
+    end,
+    schedule = function(fn)
+      -- Execute immediately in tests
+      fn()
     end,
     log = {
       levels = {
@@ -65,15 +68,18 @@ describe("cli", function()
       notify_level = level
     end
 
-    -- Mock vim.system to track calls
-    vim.system = function(cmd, opts)
+    -- Mock vim.schedule to execute immediately
+    vim.schedule = function(fn)
+      fn()
+    end
+
+    -- Mock vim.system to track calls and execute callback immediately
+    vim.system = function(cmd, opts, callback)
       system_called = true
       system_cmd = cmd
-      return {
-        wait = function()
-          return { code = 0, stdout = "output", stderr = "" }
-        end,
-      }
+      if callback then
+        callback({ code = 0, stdout = "output", stderr = "" })
+      end
     end
 
     -- Mock jira.util
@@ -157,12 +163,10 @@ describe("cli", function()
     end)
 
     it("should call vim.notify with error message on failure", function()
-      vim.system = function(cmd, opts)
-        return {
-          wait = function()
-            return { code = 1, stdout = "", stderr = "Not found" }
-          end,
-        }
+      vim.system = function(cmd, opts, callback)
+        if callback then
+          callback({ code = 1, stdout = "", stderr = "Not found" })
+        end
       end
 
       cli = require("jira.cli")
@@ -176,12 +180,10 @@ describe("cli", function()
     end)
 
     it("should support function for error message", function()
-      vim.system = function(cmd, opts)
-        return {
-          wait = function()
-            return { code = 1, stdout = "", stderr = "Not found" }
-          end,
-        }
+      vim.system = function(cmd, opts, callback)
+        if callback then
+          callback({ code = 1, stdout = "", stderr = "Not found" })
+        end
       end
 
       cli = require("jira.cli")
@@ -212,12 +214,10 @@ describe("cli", function()
     end)
 
     it("should call on_error callback on failure", function()
-      vim.system = function(cmd, opts)
-        return {
-          wait = function()
-            return { code = 1, stdout = "", stderr = "Error" }
-          end,
-        }
+      vim.system = function(cmd, opts, callback)
+        if callback then
+          callback({ code = 1, stdout = "", stderr = "Error" })
+        end
       end
 
       local callback_called = false
@@ -235,15 +235,6 @@ describe("cli", function()
       assert.are.equal(1, callback_result.code)
     end)
 
-    it("should return result object", function()
-      cli = require("jira.cli")
-      local result = cli.execute({ "issue", "view", "PROJ-123" })
-
-      assert.is_not_nil(result)
-      assert.are.equal(0, result.code)
-      assert.are.equal("output", result.stdout)
-    end)
-
     it("should handle empty args", function()
       cli = require("jira.cli")
       cli.execute({})
@@ -254,10 +245,9 @@ describe("cli", function()
 
     it("should handle opts being nil", function()
       cli = require("jira.cli")
-      local result = cli.execute({ "me" }, nil)
+      cli.execute({ "me" }, nil)
 
-      assert.is_not_nil(result)
-      assert.are.equal(0, result.code)
+      assert.is_true(system_called)
     end)
   end)
 

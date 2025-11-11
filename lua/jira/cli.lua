@@ -92,14 +92,14 @@ local function _build_issue_edit_summary_args(key, summary)
   return { "issue", "edit", key, "--summary", summary, "--no-input" }
 end
 
----Execute a Jira CLI command
+---Execute a Jira CLI command asynchronously
 ---@param args table Command arguments (e.g., {"issue", "edit", key, "--summary", title})
 ---@param opts table? Options table with:
 ---   - on_success: function(result) Callback on success
 ---   - on_error: function(result) Callback on error
 ---   - success_msg: string|function(result) Success notification message
 ---   - error_msg: string|function(result) Error notification message
----@return table result The vim.system result object
+---   - progress_msg: string Optional progress notification shown before execution
 local function execute(args, opts)
   opts = opts or {}
 
@@ -112,95 +112,93 @@ local function execute(args, opts)
     vim.notify("JIRA CLI Command:\n" .. table.concat(cmd, " "), vim.log.levels.INFO)
   end
 
-  -- Execute command
-  local result = vim.system(cmd, { text = true }):wait()
-
-  -- Handle result
-  if result.code == 0 then
-    -- Success notification
-    if opts.success_msg then
-      local msg = type(opts.success_msg) == "function" and opts.success_msg(result) or opts.success_msg
-      vim.notify(msg, vim.log.levels.INFO)
-    end
-
-    -- Success callback
-    if opts.on_success then
-      opts.on_success(result)
-    end
-  else
-    -- Error notification
-    if opts.error_msg then
-      local msg = type(opts.error_msg) == "function" and opts.error_msg(result) or opts.error_msg
-      local error_detail = result.stderr or "Unknown error"
-      vim.notify(string.format("%s: %s", msg, error_detail), vim.log.levels.ERROR)
-    end
-
-    -- Error callback
-    if opts.on_error then
-      opts.on_error(result)
-    end
+  -- Show progress notification
+  if opts.progress_msg then
+    vim.notify(opts.progress_msg, vim.log.levels.INFO)
   end
 
-  return result
+  -- Execute command asynchronously
+  vim.system(cmd, { text = true }, function(result)
+    vim.schedule(function()
+      -- Handle result
+      if result.code == 0 then
+        -- Success notification
+        if opts.success_msg then
+          local msg = type(opts.success_msg) == "function" and opts.success_msg(result) or opts.success_msg
+          vim.notify(msg, vim.log.levels.INFO)
+        end
+
+        -- Success callback
+        if opts.on_success then
+          opts.on_success(result)
+        end
+      else
+        -- Error notification
+        if opts.error_msg then
+          local msg = type(opts.error_msg) == "function" and opts.error_msg(result) or opts.error_msg
+          local error_detail = result.stderr or "Unknown error"
+          vim.notify(string.format("%s: %s", msg, error_detail), vim.log.levels.ERROR)
+        end
+
+        -- Error callback
+        if opts.on_error then
+          opts.on_error(result)
+        end
+      end
+    end)
+  end)
 end
 
 ---Open an issue in browser
 ---@param key string Issue key
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
----@return table result The vim.system result object
 local function open_issue(key, opts)
-  return execute(_build_issue_open_args(key), opts)
+  execute(_build_issue_open_args(key), opts)
 end
 
 ---Get current user
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
----@return table result The vim.system result object
 local function get_current_user(opts)
-  return execute(_build_me_args(), opts)
+  execute(_build_me_args(), opts)
 end
 
 ---Transition issue to a different status
 ---@param key string Issue key
 ---@param transition string Transition name
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
----@return table result The vim.system result object
 local function transition_issue(key, transition, opts)
-  return execute(_build_issue_move_args(key, transition), opts)
+  execute(_build_issue_move_args(key, transition), opts)
 end
 
 ---Assign issue to a user
 ---@param key string Issue key
 ---@param user string Username or account ID
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
----@return table result The vim.system result object
 local function assign_issue(key, user, opts)
-  return execute(_build_issue_assign_args(key, user), opts)
+  execute(_build_issue_assign_args(key, user), opts)
 end
 
 ---Unassign issue
 ---@param key string Issue key
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
----@return table result The vim.system result object
 local function unassign_issue(key, opts)
-  return execute(_build_issue_unassign_args(key), opts)
+  execute(_build_issue_unassign_args(key), opts)
 end
 
 ---Add comment to issue
 ---@param key string Issue key
 ---@param text string Comment text
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
----@return table result The vim.system result object
 local function comment_issue(key, text, opts)
-  return execute(_build_issue_comment_args(key, text), opts)
+  execute(_build_issue_comment_args(key, text), opts)
 end
 
 ---Edit issue title/summary
 ---@param key string Issue key
 ---@param summary string New summary/title
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
----@return table result The vim.system result object
 local function edit_issue_title(key, summary, opts)
-  return execute(_build_issue_edit_summary_args(key, summary), opts)
+  execute(_build_issue_edit_summary_args(key, summary), opts)
 end
 
 ---Get available transitions for an issue

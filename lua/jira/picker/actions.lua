@@ -1,6 +1,6 @@
 local cli = require("jira.cli")
 
---- Open issue in browser
+---Open issue in browser
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
@@ -16,7 +16,7 @@ local function action_jira_open_browser(picker, item, action)
   })
 end
 
---- Copy issue key to clipboard
+---Copy issue key to clipboard
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
@@ -26,16 +26,13 @@ local function action_jira_copy_key(picker, item, action)
     return
   end
 
-  -- Copy to system clipboard
   vim.fn.setreg("+", item.key)
-
-  -- Also copy to unnamed register
   vim.fn.setreg('"', item.key)
 
   vim.notify(string.format("Copied %s to clipboard", item.key), vim.log.levels.INFO)
 end
 
---- Transition issue to different status
+---Transition issue to different status
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param _ snacks.picker.Action
@@ -45,7 +42,6 @@ local function action_jira_transition(picker, item, _)
     return
   end
 
-  -- Get available transitions dynamically
   cli.get_transitions(item.key, function(transitions)
     if not transitions then
       vim.notify("Failed to fetch transitions", vim.log.levels.ERROR)
@@ -76,7 +72,7 @@ local function action_jira_transition(picker, item, _)
   end)
 end
 
---- Assign issue to current user
+---Assign issue to current user
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
@@ -86,27 +82,25 @@ local function action_jira_assign_me(picker, item, action)
     return
   end
 
-  -- First get current user
-  local me_result = cli.get_current_user({
+  -- First get current user, then assign
+  cli.get_current_user({
+    progress_msg = "Getting current user...",
     error_msg = "Failed to get current user",
-  })
-
-  if me_result.code ~= 0 then
-    return
-  end
-
-  local me = vim.trim(me_result.stdout)
-
-  cli.assign_issue(item.key, me, {
-    success_msg = string.format("Assigned %s to you", item.key),
-    error_msg = string.format("Failed to assign %s", item.key),
-    on_success = function()
-      picker:refresh()
+    on_success = function(result)
+      local me = vim.trim(result.stdout)
+      cli.assign_issue(item.key, me, {
+        progress_msg = string.format("Assigning %s...", item.key),
+        success_msg = string.format("Assigned %s to you", item.key),
+        error_msg = string.format("Failed to assign %s", item.key),
+        on_success = function()
+          picker:refresh()
+        end,
+      })
     end,
   })
 end
 
---- Unassign issue
+---Unassign issue
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
@@ -125,7 +119,7 @@ local function action_jira_unassign(picker, item, action)
   })
 end
 
---- Submit comment from scratch buffer
+---Submit comment from scratch buffer
 ---@param issue_key string
 ---@param win snacks.win
 local function submit_comment(issue_key, win)
@@ -146,7 +140,7 @@ local function submit_comment(issue_key, win)
   })
 end
 
---- Add comment to issue
+---Add comment to issue
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
@@ -170,9 +164,7 @@ local function action_jira_add_comment(picker, item, action)
       keys = {
         submit = {
           "<c-s>",
-          function(win)
-            submit_comment(item.key, win)
-          end,
+          function(win) submit_comment(item.key, win) end,
           desc = "Submit comment",
           mode = { "n", "i" },
         },
@@ -186,7 +178,7 @@ local function action_jira_add_comment(picker, item, action)
   })
 end
 
---- Edit issue title
+---Edit issue title
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
@@ -218,8 +210,8 @@ local function action_jira_edit_title(picker, item, action)
   end)
 end
 
---- Define all actions with metadata
---- Get available actions for an item
+---Define all actions with metadata
+---Get available actions for an item
 ---@param item snacks.picker.Item
 ---@param ctx table?
 ---@return table<string, table> actions Map of action name to action metadata
@@ -276,7 +268,7 @@ local function get_jira_actions(item, ctx)
   }
 end
 
---- Action to show action dialog
+---Action to show action dialog
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
