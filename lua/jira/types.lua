@@ -1,12 +1,15 @@
----@class jira.CliConfig
----@field cmd string Path to jira CLI binary
-
 ---@class jira.QueryConfig
 ---@field args string[] Default CLI arguments for sprint list
 ---@field columns string[] Columns to display
 ---@field filters string[] Default filters for sprint list
 ---@field order_by string Sort order field
 ---@field prefill_search string? Prefill the picker search input field
+
+---@class jira.CliConfig
+---@field cmd string Path to jira CLI binary
+---@field query jira.QueryConfig Query settings for sprint issues
+---@field epic jira.QueryConfig Query settings for epics
+---@field epic_issues jira.QueryConfig Query settings for epic issues
 
 ---@class jira.UIConfig
 ---@field type_icons table<string, string> Icons for issue types
@@ -31,9 +34,6 @@
 
 ---@class jira.Config
 ---@field cli jira.CliConfig CLI settings
----@field query jira.QueryConfig Query settings
----@field epic jira.QueryConfig Epic query settings
----@field epic_issues jira.QueryConfig Epic issues query settings
 ---@field ui jira.UIConfig UI settings
 ---@field layout jira.LayoutConfig Layout settings
 ---@field preview jira.PreviewConfig Preview settings

@@ -54,7 +54,7 @@ local function source_jira_issues()
     format = "format_jira_issues",
     preview = "preview_jira_issue",
     confirm = "action_jira_list_actions",
-    pattern = config.query.prefill_search,
+    pattern = config.cli.query.prefill_search,
 
     win = {
       input = {
@@ -87,7 +87,7 @@ local function source_jira_epic_issues(epic_key)
     format = "format_jira_issues",
     preview = "preview_jira_issue",
     confirm = "action_jira_list_actions",
-    pattern = config.epic_issues.prefill_search,
+    pattern = config.cli.epic_issues.prefill_search,
 
     win = {
       input = {
@@ -116,7 +116,7 @@ local function source_jira_epics()
     main = { current = true },
     finder = finders.get_jira_epics,
     format = "format_jira_epics",
-    pattern = config.epic.prefill_search,
+    pattern = config.cli.epic.prefill_search,
     confirm = function(picker, item)
       picker:close()
       if item and item.key then

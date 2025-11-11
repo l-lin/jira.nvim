@@ -5,34 +5,34 @@ M.defaults = {
   cli = {
     -- Cmd to invoke the Jira CLI tool
     cmd = "jira",
-  },
 
-  -- Configuration for fetching current sprint issues
-  query = {
-    args = { "sprint", "list", "--current" },
-    columns = { "type", "key", "assignee", "status", "summary", "labels" },
-    filters = { "-s~archive", "-s~done" },
-    order_by = "status",
-    -- Prefill search prompt, e.g. add your name to pre-filter your assigned issues
-    prefill_search = "",
-  },
+    -- Configuration for fetching current sprint issues
+    query = {
+      args = { "sprint", "list", "--current" },
+      columns = { "type", "key", "assignee", "status", "summary", "labels" },
+      filters = { "-s~archive", "-s~done" },
+      order_by = "status",
+      -- Prefill search prompt, e.g. add your name to pre-filter your assigned issues
+      prefill_search = "",
+    },
 
-  -- Configuration for listing epics
-  epic = {
-    args = { "issue", "list", "--type", "Epic" },
-    columns = { "key", "summary", "status" },
-    filters = { "-s~done", "-s~closed", "-s~archive" },
-    order_by = "created",
-    prefill_search = "",
-  },
+    -- Configuration for listing epics
+    epic = {
+      args = { "issue", "list", "--type", "Epic" },
+      columns = { "key", "summary", "status" },
+      filters = { "-s~done", "-s~closed", "-s~archive" },
+      order_by = "created",
+      prefill_search = "",
+    },
 
-  -- Configuration for fetching issues within an epic
-  epic_issues = {
-    args = { "issue", "list" },
-    columns = { "type", "key", "assignee", "status", "summary", "labels" },
-    filters = { "-s~archive", "-s~done" },
-    order_by = "status",
-    prefill_search = "",
+    -- Configuration for fetching issues within an epic
+    epic_issues = {
+      args = { "issue", "list" },
+      columns = { "type", "key", "assignee", "status", "summary", "labels" },
+      filters = { "-s~archive", "-s~done" },
+      order_by = "status",
+      prefill_search = "",
+    },
   },
 
   -- Layout configuration for pickers

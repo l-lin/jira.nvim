@@ -125,7 +125,7 @@ local function get_jira_issues(opts, ctx)
 
   return create_jira_finder(
     cli.get_sprint_list_args,
-    config.query.columns,
+    config.cli.query.columns,
     transform_issue
   )(opts, ctx)
 end
@@ -137,7 +137,7 @@ local function get_jira_epics(opts, ctx)
 
   return create_jira_finder(
     cli.get_epic_list_args,
-    config.epic.columns,
+    config.cli.epic.columns,
     transform_epic
   )(opts, ctx)
 end
@@ -157,7 +157,7 @@ local function get_jira_epic_issues(epic_key, opts, ctx)
 
   return create_jira_finder(
     function() return cli.get_epic_issues_args(epic_key) end,
-    config.epic_issues.columns,
+    config.cli.epic_issues.columns,
     transform_issue
   )(opts, ctx)
 end
