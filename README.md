@@ -4,6 +4,8 @@ Neovim plugin for browsing and managing JIRA issues with a fuzzy-finding interfa
 
 > This plugin was heavily inspired by the awesome [snacks.nvim gh plugin](https://github.com/folke/snacks.nvim/blob/main/docs/gh.md)!
 
+![showcase](./.github/showcase.png)
+
 ## Features
 
 - 🔍 Fuzzy search JIRA issues and epics
