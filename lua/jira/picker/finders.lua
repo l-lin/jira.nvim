@@ -26,7 +26,7 @@ end
 ---@type snacks.picker.finder
 local function get_jira_issues(opts, ctx)
   local config = require("jira.config").options
-  local args = require("jira.api").build_sprint_list_args()
+  local args = require("jira.cli").get_sprint_list_args()
   local columns = config.query.columns
 
   local first_line = true

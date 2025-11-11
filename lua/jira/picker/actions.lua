@@ -1,5 +1,4 @@
 local cli = require("jira.cli")
-local api = require("jira.api")
 
 --- Open issue in browser
 ---@param picker snacks.Picker
@@ -11,7 +10,7 @@ local function action_jira_open_browser(picker, item, action)
     return
   end
 
-  cli.execute(api.build_issue_open_args(item.key), {
+  cli.open_issue(item.key, {
     success_msg = string.format("Opened %s in browser", item.key),
     error_msg = string.format("Failed to open %s", item.key),
   })
@@ -124,7 +123,7 @@ local function action_jira_transition(picker, item, action)
       end
 
       -- Execute transition
-      cli.execute(api.build_issue_move_args(item.key, choice), {
+      cli.transition_issue(item.key, choice, {
         success_msg = string.format("Transitioned %s to %s", item.key, choice),
         error_msg = string.format("Failed to transition %s", item.key),
         on_success = function()
@@ -146,7 +145,7 @@ local function action_jira_assign_me(picker, item, action)
   end
 
   -- First get current user
-  local me_result = cli.execute(api.build_me_args(), {
+  local me_result = cli.get_current_user({
     error_msg = "Failed to get current user",
   })
 
@@ -156,7 +155,7 @@ local function action_jira_assign_me(picker, item, action)
 
   local me = vim.trim(me_result.stdout)
 
-  cli.execute(api.build_issue_assign_args(item.key, me), {
+  cli.assign_issue(item.key, me, {
     success_msg = string.format("Assigned %s to you", item.key),
     error_msg = string.format("Failed to assign %s", item.key),
     on_success = function()
@@ -175,7 +174,7 @@ local function action_jira_unassign(picker, item, action)
     return
   end
 
-  cli.execute(api.build_issue_unassign_args(item.key), {
+  cli.unassign_issue(item.key, {
     success_msg = string.format("Unassigned %s", item.key),
     error_msg = string.format("Failed to unassign %s", item.key),
     on_success = function()
@@ -196,7 +195,7 @@ local function submit_comment(issue_key, win)
     return
   end
 
-  cli.execute(api.build_issue_comment_args(issue_key, comment), {
+  cli.comment_issue(issue_key, comment, {
     success_msg = string.format("Added comment to %s", issue_key),
     error_msg = string.format("Failed to comment on %s", issue_key),
     on_success = function()
@@ -267,7 +266,7 @@ local function action_jira_edit_title(picker, item, action)
       return
     end
 
-    cli.execute(api.build_issue_edit_summary_args(item.key, new_title), {
+    cli.edit_issue_title(item.key, new_title, {
       success_msg = string.format("Updated title for %s", item.key),
       error_msg = string.format("Failed to update title for %s", item.key),
       on_success = function()
