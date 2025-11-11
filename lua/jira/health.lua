@@ -34,6 +34,20 @@ function M.check()
   else
     vim.health.error("jira CLI is not installed", "Install jira CLI: https://github.com/ankitpokhrel/jira-cli")
   end
+
+  -- Check sqlite if cache is enabled
+  local config = require("jira.config").options
+  if config.cache and config.cache.enabled then
+    local has_sqlite = pcall(require, "snacks.picker.util.db")
+    if has_sqlite then
+      vim.health.ok("SQLite support is available (via snacks.picker.util.db)")
+    else
+      vim.health.error(
+        "SQLite support is not available but cache is enabled",
+        "Ensure snacks.nvim has SQLite support or disable cache in config"
+      )
+    end
+  end
 end
 
 return M
