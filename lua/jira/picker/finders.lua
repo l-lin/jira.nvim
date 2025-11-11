@@ -83,18 +83,13 @@ local function with_cache(cache_key, cache_params, finder_fn)
     local cache = require("jira.cache")
 
     -- Check if we should use cache
-    local use_cache = config.cache.enabled or true
+    local use_cache = config.cache.enabled
 
     -- Try to get from cache first
     if use_cache then
       local cached = cache.get(cache_key, cache_params)
       if cached and cached.items then
-        ---@async
-        return function(cb)
-          for _, item in ipairs(cached.items) do
-            cb(item)
-          end
-        end
+        return ctx.filter:filter(cached.items)
       end
     end
 
