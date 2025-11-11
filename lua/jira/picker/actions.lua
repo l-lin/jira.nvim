@@ -200,7 +200,7 @@ local function action_jira_add_comment(picker, item, action)
     template = "",
     win = {
       relative = "editor",
-      width = 80,
+      width = 160,
       height = 15,
       title = string.format(" Add Comment to %s ", item.key),
       title_pos = "center",
@@ -297,7 +297,7 @@ local function action_jira_edit_description(picker, item, action)
       template = description,
       win = {
         relative = "editor",
-        width = 80,
+        width = 160,
         height = 20,
         title = string.format(" Edit Description for %s ", item.key),
         title_pos = "center",
