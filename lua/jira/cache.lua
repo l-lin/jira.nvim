@@ -76,7 +76,7 @@ end
 
 ---Clear cached data for a query (or all if no query_type specified)
 ---@param query_type? string Type of query to clear (nil = clear all)
----@param params? table Optional parameters
+---@param params? table Optional parameters (nil = clear all with matching query_type prefix)
 local function clear(query_type, params)
   local database = init_db()
   if not database then
@@ -88,6 +88,10 @@ local function clear(query_type, params)
     if require("jira.config").options.debug then
       vim.notify("[JIRA Cache] Cache cleared", vim.log.levels.INFO)
     end
+  elseif not params then
+    local delete = database:prepare("DELETE FROM cache WHERE key = ? OR key LIKE ?;")
+    delete:exec({ query_type, query_type .. ":%"})
+    delete:close()
   else
     local key = make_key(query_type, params)
     local delete = database:prepare("DELETE FROM cache WHERE key = ?;")

@@ -82,16 +82,17 @@ local function show_transition_select(picker, item, transitions)
       return
     end
 
-    cli.transition_issue(item.key, choice, {
-      success_msg = string.format("Transitioned %s to %s", item.key, choice),
-      error_msg = string.format("Failed to transition %s", item.key),
-      on_success = function()
-        local cache = require("jira.cache")
-        cache.clear(cache.keys.ISSUE_VIEW, { key = item.key })
-        cache.clear(cache.keys.ISSUES)
-        picker:refresh()
-      end,
-    })
+      cli.transition_issue(item.key, choice, {
+        success_msg = string.format("Transitioned %s to %s", item.key, choice),
+        error_msg = string.format("Failed to transition %s", item.key),
+        on_success = function()
+          local cache = require("jira.cache")
+          cache.clear(cache.keys.ISSUE_VIEW, { key = item.key })
+          cache.clear(cache.keys.ISSUES)
+          cache.clear(cache.keys.EPIC_ISSUES)
+          picker:refresh()
+        end,
+      })
   end)
 end
 
@@ -134,6 +135,7 @@ local function action_jira_assign_me(picker, item, action)
           local cache = require("jira.cache")
           cache.clear(cache.keys.ISSUE_VIEW, { key = item.key })
           cache.clear(cache.keys.ISSUES)
+          cache.clear(cache.keys.EPIC_ISSUES)
           picker:refresh()
         end,
       })
@@ -157,6 +159,7 @@ local function action_jira_unassign(picker, item, action)
       local cache = require("jira.cache")
       cache.clear(cache.keys.ISSUE_VIEW, { key = item.key })
       cache.clear(cache.keys.ISSUES)
+      cache.clear(cache.keys.EPIC_ISSUES)
       picker:refresh()
     end,
   })
@@ -250,6 +253,7 @@ local function action_jira_edit_summary(picker, item, action)
         local cache = require("jira.cache")
         cache.clear(cache.keys.ISSUE_VIEW, { key = item.key })
         cache.clear(cache.keys.ISSUES)
+        cache.clear(cache.keys.EPIC_ISSUES)
         picker:refresh()
       end,
     })
