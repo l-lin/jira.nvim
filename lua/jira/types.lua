@@ -38,8 +38,16 @@
 ---@field enabled boolean Enable/disable caching of JIRA query results
 ---@field path? string Path to cache database (defaults to Neovim data directory)
 
+---@class jira.ActionStartWorkSteps
+---@field assign? boolean Enable/disable assigning issue to current user (default: true)
+---@field move_to_sprint? boolean Enable/disable moving issue to active sprint (default: true)
+---@field transition? boolean Enable/disable transitioning issue to configured state (default: true)
+---@field git_branch? boolean Enable/disable creating/switching to git branch (default: true)
+---@field yank? boolean Enable/disable copying issue key to clipboard (default: true)
+
 ---@class jira.ActionStartWorkConfig
 ---@field transition string the transition name to change for the issue when executing the action
+---@field steps? jira.ActionStartWorkSteps configure which steps to execute (all enabled by default)
 
 ---@class jira.ActionConfig
 ---@field start_work jira.ActionStartWorkConfig Start work action settings

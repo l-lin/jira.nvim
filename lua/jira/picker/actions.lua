@@ -419,9 +419,23 @@ local function action_jira_start_work(picker, item, action)
     return
   end
 
+  local steps = vim.tbl_extend("force", {
+    assign = true,
+    move_to_sprint = true,
+    transition = true,
+    git_branch = true,
+    yank = true,
+  }, config.action.start_work.steps or {})
+
+  local total_steps = 0
+  for _, enabled in pairs(steps) do
+    if enabled then
+      total_steps = total_steps + 1
+    end
+  end
+
   local errors = {}
   local successes = {}
-  local total_steps = 5
   local completed_steps = 0
 
   local function step_done(step_name, err, success_msg)
@@ -453,82 +467,92 @@ local function action_jira_start_work(picker, item, action)
   end
 
   -- Step 1: Assign to current user
-  cli.get_current_user({
-    error_msg = false,
-    on_success = function(result)
-      local me = vim.trim(result.stdout or "")
-      cli.assign_issue(item.key, me, {
-        error_msg = false,
-        on_success = function()
-          step_done("Assign", nil, "assigned to you")
-        end,
-        on_error = function(err_result)
-          step_done("Assign", err_result.stderr or "Unknown error")
-        end,
-      })
-    end,
-    on_error = function(result)
-      step_done("Assign", result.stderr or "Failed to get current user")
-    end,
-  })
-
-  -- Step 2: Move to active sprint
-  get_sprints_cached(function(sprints)
-    if not sprints or #sprints == 0 then
-      step_done("Move to sprint", nil, "skipped (no sprints)")
-      return
-    end
-
-    local active = vim.tbl_filter(function(s)
-      return s.state == "active"
-    end, sprints)
-
-    if #active == 0 then
-      step_done("Move to sprint", nil, "skipped (no active sprint)")
-      return
-    end
-
-    cli.move_issue_to_sprint(item.key, active[1].id, {
+  if steps.assign then
+    cli.get_current_user({
       error_msg = false,
-      on_success = function()
-        step_done("Move to sprint", nil, string.format("moved to %s", active[1].name))
+      on_success = function(result)
+        local me = vim.trim(result.stdout or "")
+        cli.assign_issue(item.key, me, {
+          error_msg = false,
+          on_success = function()
+            step_done("Assign", nil, "assigned to you")
+          end,
+          on_error = function(err_result)
+            step_done("Assign", err_result.stderr or "Unknown error")
+          end,
+        })
       end,
       on_error = function(result)
-        step_done("Move to sprint", result.stderr or "Unknown error")
+        step_done("Assign", result.stderr or "Failed to get current user")
       end,
     })
-  end)
+  end
 
-  -- Step 3: Transition to configured state
-  cli.transition_issue(item.key, transition, {
-    error_msg = false,
-    on_success = function()
-      step_done("Transition", nil, string.format("transitioned to %s", transition))
-    end,
-    on_error = function(result)
-      step_done("Transition", result.stderr or "Unknown error")
-    end,
-  })
-
-  -- Step 4: Git branch
-  if not git.is_git_repo() then
-    step_done("Git branch", nil, "skipped (not in git repo)")
-  else
-    git.switch_branch(item.key, function(err, mode)
-      if err then
-        step_done("Git branch", err)
-      else
-        step_done("Git branch", nil, string.format("branch %s", mode))
+  -- Step 2: Move to active sprint
+  if steps.move_to_sprint then
+    get_sprints_cached(function(sprints)
+      if not sprints or #sprints == 0 then
+        step_done("Move to sprint", nil, "skipped (no sprints)")
+        return
       end
+
+      local active = vim.tbl_filter(function(s)
+        return s.state == "active"
+      end, sprints)
+
+      if #active == 0 then
+        step_done("Move to sprint", nil, "skipped (no active sprint)")
+        return
+      end
+
+      cli.move_issue_to_sprint(item.key, active[1].id, {
+        error_msg = false,
+        on_success = function()
+          step_done("Move to sprint", nil, string.format("moved to %s", active[1].name))
+        end,
+        on_error = function(result)
+          step_done("Move to sprint", result.stderr or "Unknown error")
+        end,
+      })
     end)
   end
 
+  -- Step 3: Transition to configured state
+  if steps.transition then
+    cli.transition_issue(item.key, transition, {
+      error_msg = false,
+      on_success = function()
+        step_done("Transition", nil, string.format("transitioned to %s", transition))
+      end,
+      on_error = function(result)
+        step_done("Transition", result.stderr or "Unknown error")
+      end,
+    })
+  end
+
+  -- Step 4: Git branch
+  if steps.git_branch then
+    if not git.is_git_repo() then
+      step_done("Git branch", nil, "skipped (not in git repo)")
+    else
+      git.switch_branch(item.key, function(err, mode)
+        if err then
+          step_done("Git branch", err)
+        else
+          step_done("Git branch", nil, string.format("branch %s", mode))
+        end
+      end)
+    end
+  end
+
   -- Step 5: Yank issue key
-  vim.schedule(function()
-    vim.fn.setreg(CLIPBOARD_REG, item.key)
-    vim.fn.setreg(DEFAULT_REG, item.key)
-    step_done("Yank", nil, "copied to clipboard")
-  end)
+  if steps.yank then
+    vim.schedule(function()
+      vim.fn.setreg(CLIPBOARD_REG, item.key)
+      vim.fn.setreg(DEFAULT_REG, item.key)
+      step_done("Yank", nil, "copied to clipboard")
+    end)
+  end
 end
 
 ---Define all actions with metadata

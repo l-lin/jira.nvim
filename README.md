@@ -153,11 +153,39 @@ require("jira").setup({
 })
 ```
 
-### Customize "Start Work" transition
+### Customize "Start Work" action
 
 ```lua
 require("jira").setup({
-  start_work_transition = "In Progress", -- Change the transition state for "Start Work" action
+  action = {
+    start_work = {
+      -- Change the transition state for "Start Work" action
+      transition = "In Progress",
+      -- Configure which steps to execute (all enabled by default)
+      steps = {
+        assign = true,         -- Assign issue to current user
+        move_to_sprint = true, -- Move issue to active sprint
+        transition = true,     -- Transition issue to configured state
+        git_branch = true,     -- Create/switch to git branch
+        yank = true,           -- Copy issue key to clipboard
+      },
+    },
+  },
+})
+```
+
+You can disable any step by setting it to `false`. For example, to skip git branch creation:
+
+```lua
+require("jira").setup({
+  action = {
+    start_work = {
+      transition = "In Progress",
+      steps = {
+        git_branch = false, -- Disable git branch creation
+      },
+    },
+  },
 })
 ```
 

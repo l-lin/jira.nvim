@@ -167,6 +167,19 @@ configuration:
         sprints = { preset = "select", layout = { max_width = 60 } },
       },
 
+      action = {
+        start_work = {
+          transition = "In Progress",
+          steps = {
+            assign = true,
+            move_to_sprint = true,
+            transition = true,
+            git_branch = true,
+            yank = true,
+          },
+        },
+      },
+
       preview = {
         nb_comments = 10,
       },
@@ -290,6 +303,24 @@ layout                                                         *jira-layout*
       • preset: Snacks picker preset name
       • layout: Layout options (e.g., {max_width = 120})
 
+action.start_work                                     *jira-action-start-work*
+    Type: `table`
+
+    Configuration for the "Start Work" action.
+
+    Fields:
+      • transition (string): The transition name to change the issue to
+                            (default: "In Progress")
+      • steps (table): Configure which steps to execute (all enabled by
+                      default):
+        - assign (boolean): Assign issue to current user (default: true)
+        - move_to_sprint (boolean): Move issue to active sprint
+                                   (default: true)
+        - transition (boolean): Transition issue to configured state
+                               (default: true)
+        - git_branch (boolean): Create/switch to git branch (default: true)
+        - yank (boolean): Copy issue key to clipboard (default: true)
+
 preview.nb_comments                                   *jira-preview-comments*
     Type: `number`
     Default: `10`
@@ -396,6 +427,39 @@ Pre-fill search query:
     })
 <
 
+Customize "Start Work" action:
+>lua
+    require("jira").setup({
+      action = {
+        start_work = {
+          transition = "In Progress",
+          steps = {
+            assign = true,
+            move_to_sprint = true,
+            transition = true,
+            git_branch = true,
+            yank = true,
+          },
+        },
+      },
+    })
+<
+
+Disable specific "Start Work" steps:
+>lua
+    require("jira").setup({
+      action = {
+        start_work = {
+          transition = "In Progress",
+          steps = {
+            git_branch = false,  -- Skip git branch creation
+            yank = false,        -- Skip copying to clipboard
+          },
+        },
+      },
+    })
+<
+
 ==============================================================================
 7. Keymaps                                            *jira-default-keymaps*
 
@@ -425,17 +489,33 @@ Note: All keymaps are customizable via the |jira-keymaps| configuration.
 
 When you press <CR> on an issue, the following actions are available:
 
-1. Open in browser          Open the issue in your default browser
-2. Copy key                 Yank the issue key to clipboard
-3. Transition               Change the issue status
-4. Assign to me             Assign the issue to yourself
-5. Unassign                 Remove the assignee
-6. Edit summary             Edit the issue title
-7. Edit description         Edit the issue description (markdown editor)
-8. Add comment              Add a comment (markdown editor)
+1. Start work               Automate issue workflow (see below)
+2. Open in browser          Open the issue in your default browser
+3. Copy key                 Yank the issue key to clipboard
+4. Transition               Change the issue status
+5. Assign to me             Assign the issue to yourself
+6. Unassign                 Remove the assignee
+7. Edit summary             Edit the issue title
+8. Edit description         Edit the issue description (markdown editor)
+9. Add comment              Add a comment (markdown editor)
 
 Action-specific keymaps are also available for quick access without opening
 the actions menu. See |jira-default-keymaps|.
+
+------------------------------------------------------------------------------
+START WORK ACTION                                   *jira-action-start-work*
+
+The "Start Work" action automates common workflow steps when beginning work
+on a JIRA issue. By default, it performs the following steps:
+
+1. Assign issue to current user
+2. Move issue to active sprint
+3. Transition issue to configured state (default: "In Progress")
+4. Create/switch to git branch with issue key as branch name
+5. Copy issue key to clipboard
+
+Each step can be individually enabled or disabled via the
+|jira-action-start-work| configuration. See |jira-customization| for examples.
 
 ==============================================================================
 9. Cache Management                                            *jira-cache*

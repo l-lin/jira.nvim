@@ -55,6 +55,14 @@ local defaults = {
     start_work = {
       -- Transition name to use when calling "Start work" action
       transition = "In Progress",
+      -- Configure which steps to execute (all enabled by default)
+      steps = {
+        assign = true, -- Assign issue to current user
+        move_to_sprint = true, -- Move issue to active sprint
+        transition = true, -- Transition issue to configured state
+        git_branch = true, -- Create/switch to git branch
+        yank = true, -- Copy issue key to clipboard
+      },
     },
   },
 
