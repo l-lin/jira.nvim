@@ -38,7 +38,7 @@ Neovim plugin for browsing and managing JIRA issues with a fuzzy-finding interfa
     "folke/snacks.nvim",
     "MeanderingProgrammer/render-markdown.nvim", -- optional
   },
-  cmd = { "JiraIssues", "JiraEpic" },
+  cmd = { "JiraIssues", "JiraEpic", "JiraStartWorkingOn" },
   opts = {},
 }
 ```
@@ -56,6 +56,7 @@ require("jira").setup({
 - `:JiraIssues` - Open picker for current sprint issues
 - `:JiraEpic` - Open epic picker
 - `:JiraEpic PROJ-123` - Open issues for specific epic
+- `:JiraStartWorkingOn PROJ-123` - Start working on an issue (assign, move to sprint, transition, create git branch, yank key)
 
 ### Keymaps
 
@@ -90,6 +91,7 @@ require("jira").setup({
 When you press `<CR>` on an issue, you get the following actions:
 
 1. **Open in browser** - Opens issue in default browser
+1. **Start work on issue** - Assign to you, move to active sprint, transition, create git branch, yank key
 1. **Copy key** - Yanks issue key to clipboard
 1. **Transition** - Change issue status
 1. **Assign to me** - Assigns issue to you
@@ -151,6 +153,14 @@ require("jira").setup({
 })
 ```
 
+### Customize "Start Work" transition
+
+```lua
+require("jira").setup({
+  start_work_transition = "In Progress", -- Change the transition state for "Start Work" action
+})
+```
+
 ## Cache Management
 
 The plugin uses SQLite to cache JIRA data for better performance:
@@ -209,6 +219,9 @@ require("jira").open_jira_epic()
 
 -- Open specific epic's issues
 require("jira").open_jira_epic("PROJ-123")
+
+-- Start working on issue
+require("jira").start_working_on({ fargs = { "PROJ-123" } })
 ```
 
 ## License

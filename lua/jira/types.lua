@@ -38,10 +38,17 @@
 ---@field enabled boolean Enable/disable caching of JIRA query results
 ---@field path? string Path to cache database (defaults to Neovim data directory)
 
+---@class jira.ActionStartWorkConfig
+---@field transition string the transition name to change for the issue when executing the action
+
+---@class jira.ActionConfig
+---@field start_work jira.ActionStartWorkConfig Start work action settings
+
 ---@class jira.Config
 ---@field cli jira.CliConfig CLI settings
----@field ui jira.UIConfig UI settings
 ---@field layout jira.LayoutConfig Layout settings
+---@field ui jira.UIConfig UI settings
+---@field action jira.ActionConfig Action settings
 ---@field preview jira.PreviewConfig Preview settings
 ---@field keymaps jira.Keymaps Custom keymaps
 ---@field cache jira.CacheConfig Cache settings

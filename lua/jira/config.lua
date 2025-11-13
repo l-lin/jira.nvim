@@ -44,7 +44,21 @@ local defaults = {
     sprints = { preset = "select", layout = { max_width = 60 } },
   },
 
-  -- Preview configuration
+  -- Actions on issues configuration
+  action = {
+    -- Action to start working on a issue, which does:
+    -- 1. assign the issue to current user
+    -- 3. move to active sprint
+    -- 3. transition the issue to the configured state
+    -- 4. create/change to git branch with the issue key as the branch name
+    -- 5. yank the issue key to clipboard
+    start_work = {
+      -- Transition name to use when calling "Start work" action
+      transition = "In Progress",
+    },
+  },
+
+  -- Issue preview configuration
   preview = {
     nb_comments = 10,
   },

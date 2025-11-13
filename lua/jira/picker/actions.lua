@@ -1,4 +1,5 @@
 local cli = require("jira.cli")
+local git = require("jira.git")
 
 local CLIPBOARD_REG = "+"
 local DEFAULT_REG = '"'
@@ -401,6 +402,135 @@ local function action_jira_refresh_cache(picker, item, action)
   picker:refresh()
 end
 
+---Start work on issue (assign, sprint, transition, git branch, yank)
+---@param picker snacks.Picker?
+---@param item snacks.picker.Item
+---@param action snacks.picker.Action?
+local function action_jira_start_work(picker, item, action)
+  if not validate_item_key(item) then
+    return
+  end
+
+  local config = require("jira.config").options
+  local transition = config.action.start_work.transition
+
+  if not transition or transition == "" then
+    vim.notify("action.start_work.transition not configured", vim.log.levels.WARN)
+    return
+  end
+
+  local errors = {}
+  local successes = {}
+  local total_steps = 5
+  local completed_steps = 0
+
+  local function step_done(step_name, err, success_msg)
+    completed_steps = completed_steps + 1
+
+    if err then
+      table.insert(errors, string.format("%s: %s", step_name, err))
+    elseif success_msg then
+      table.insert(successes, string.format("%s: %s", step_name, success_msg))
+    end
+
+    if completed_steps == total_steps then
+      -- Show final result
+      if #errors > 0 then
+        local msg = string.format("Completed with errors:\n%s", table.concat(errors, "\n"))
+        if #successes > 0 then
+          msg = msg .. string.format("\n\nSucceeded:\n%s", table.concat(successes, "\n"))
+        end
+        vim.notify(msg, vim.log.levels.WARN)
+      else
+        vim.notify(string.format("Started working on %s", item.key), vim.log.levels.INFO)
+      end
+
+      clear_issue_caches(item.key)
+      if picker then
+        picker:refresh()
+      end
+    end
+  end
+
+  -- Step 1: Assign to current user
+  cli.get_current_user({
+    error_msg = false,
+    on_success = function(result)
+      local me = vim.trim(result.stdout or "")
+      cli.assign_issue(item.key, me, {
+        error_msg = false,
+        on_success = function()
+          step_done("Assign", nil, "assigned to you")
+        end,
+        on_error = function(err_result)
+          step_done("Assign", err_result.stderr or "Unknown error")
+        end,
+      })
+    end,
+    on_error = function(result)
+      step_done("Assign", result.stderr or "Failed to get current user")
+    end,
+  })
+
+  -- Step 2: Move to active sprint
+  get_sprints_cached(function(sprints)
+    if not sprints or #sprints == 0 then
+      step_done("Move to sprint", nil, "skipped (no sprints)")
+      return
+    end
+
+    local active = vim.tbl_filter(function(s)
+      return s.state == "active"
+    end, sprints)
+
+    if #active == 0 then
+      step_done("Move to sprint", nil, "skipped (no active sprint)")
+      return
+    end
+
+    cli.move_issue_to_sprint(item.key, active[1].id, {
+      error_msg = false,
+      on_success = function()
+        step_done("Move to sprint", nil, string.format("moved to %s", active[1].name))
+      end,
+      on_error = function(result)
+        step_done("Move to sprint", result.stderr or "Unknown error")
+      end,
+    })
+  end)
+
+  -- Step 3: Transition to configured state
+  cli.transition_issue(item.key, transition, {
+    error_msg = false,
+    on_success = function()
+      step_done("Transition", nil, string.format("transitioned to %s", transition))
+    end,
+    on_error = function(result)
+      step_done("Transition", result.stderr or "Unknown error")
+    end,
+  })
+
+  -- Step 4: Git branch
+  if not git.is_git_repo() then
+    step_done("Git branch", nil, "skipped (not in git repo)")
+  else
+    git.switch_branch(item.key, function(err, mode)
+      if err then
+        step_done("Git branch", err)
+      else
+        step_done("Git branch", nil, string.format("branch %s", mode))
+      end
+    end)
+  end
+
+  -- Step 5: Yank issue key
+  vim.schedule(function()
+    vim.fn.setreg(CLIPBOARD_REG, item.key)
+    vim.fn.setreg(DEFAULT_REG, item.key)
+    step_done("Yank", nil, "copied to clipboard")
+  end)
+end
+
 ---Define all actions with metadata
 ---Get available actions for an item
 ---@param item snacks.picker.Item
@@ -413,6 +543,13 @@ local function get_jira_actions(item, ctx)
       icon = " ",
       priority = 100,
       action = action_jira_open_browser,
+    },
+
+    start_work = {
+      name = "Start work on issue",
+      icon = " ",
+      priority = 95,
+      action = action_jira_start_work,
     },
 
     copy_key = {
@@ -508,8 +645,15 @@ local function action_jira_list_actions(picker, item, action)
   })
 end
 
+---Start work on issue (standalone function for command use)
+---@param issue_key string
+local function start_work_on_issue(issue_key)
+  action_jira_start_work(nil, { key = issue_key }, nil)
+end
+
 local M = {}
 M.get_jira_actions = get_jira_actions
+M.start_work_on_issue = start_work_on_issue
 
 M.action_jira_list_actions = action_jira_list_actions
 M.action_jira_open_browser = action_jira_open_browser
