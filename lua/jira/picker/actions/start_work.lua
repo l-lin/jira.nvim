@@ -34,6 +34,32 @@ local function get_sprints_cached(callback)
   actions.get_sprints_cached(callback)
 end
 
+---Sanitize text for branch name (replace spaces with underscores, remove special chars)
+---@param text string
+---@return string
+local function sanitize_for_branch(text)
+  if not text or text == "" then
+    return ""
+  end
+  -- Replace spaces with underscores, remove special characters (keep alphanumeric, underscores, hyphens)
+  return text:gsub("%s+", "_"):gsub("[^%w_-]", "")
+end
+
+---Generate suggested branch name from issue key and summary
+---@param issue_key string
+---@param summary string?
+---@return string
+local function generate_branch_name(issue_key, summary)
+  if not summary or summary == "" then
+    return issue_key
+  end
+  local sanitized = sanitize_for_branch(summary)
+  if sanitized == "" then
+    return issue_key
+  end
+  return string.format("%s-%s", issue_key, sanitized)
+end
+
 ---Start work on issue (assign, sprint, transition, git branch, yank)
 ---@param picker snacks.Picker?
 ---@param item snacks.picker.Item
@@ -167,12 +193,22 @@ function M.action_jira_start_work(picker, item, action)
     if not git.is_git_repo() then
       step_done("Git branch", nil, "skipped (not in git repo)")
     else
-      git.switch_branch(item.key, function(err, mode)
-        if err then
-          step_done("Git branch", err)
-        else
-          step_done("Git branch", nil, string.format("branch %s", mode))
+      local suggested_branch = generate_branch_name(item.key, item.summary)
+      vim.ui.input({
+        prompt = "Branch name: ",
+        default = suggested_branch,
+      }, function(branch_name)
+        if not branch_name or branch_name == "" then
+          step_done("Git branch", nil, "skipped (cancelled)")
+          return
         end
+        git.switch_branch(branch_name, function(err, mode)
+          if err then
+            step_done("Git branch", err)
+          else
+            step_done("Git branch", nil, string.format("branch %s", mode))
+          end
+        end)
       end)
     end
   end
@@ -186,5 +222,9 @@ function M.action_jira_start_work(picker, item, action)
     end)
   end
 end
+
+-- Expose private functions for testing
+M._sanitize_for_branch = sanitize_for_branch
+M._generate_branch_name = generate_branch_name
 
 return M
