@@ -18,6 +18,7 @@
 ---@field issue_highlights table<string, string> Highlight groups for issue fields (key, assignee, summary, labels)
 ---@field action_highlights table<string, string> Highlight groups for action dialog (icon, number, description, fallback)
 ---@field sprint_highlights table<string, string> Highlight groups for sprint fields (state, name)
+---@field scratch { width: number, height: number } Scratch window dimensions
 
 ---@class jira.PreviewConfig
 ---@field nb_comments number Number of comments to show in preview

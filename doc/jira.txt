@@ -232,6 +232,11 @@ configuration:
           name = "",
           state = "Comment",
         },
+
+        scratch = {
+          width = 160,
+          height = 20,
+        },
       },
 
       keymaps = {
@@ -357,6 +362,17 @@ ui.action_highlights                             *jira-ui-action-highlights*
 
     Highlight groups for action items (icon, number, description, fallback).
 
+ui.scratch                                                     *jira-ui-scratch*
+    Type: `table`
+    Default: `{ width = 160, height = 20 }`
+
+    Window dimensions for markdown scratch buffers used in actions like
+    adding comments or editing descriptions.
+
+    Fields:
+      • width: Window width in columns (default: 160)
+      • height: Window height in rows (default: 20)
+
 keymaps                                                       *jira-keymaps*
     Type: `table`
 
@@ -458,6 +474,18 @@ Disable specific "Start Work" steps:
             git_branch = false,  -- Skip git branch creation
             yank = false,        -- Skip copying to clipboard
           },
+        },
+      },
+    })
+<
+
+Customize scratch window size:
+>lua
+    require("jira").setup({
+      ui = {
+        scratch = {
+          width = 120,
+          height = 30,
         },
       },
     })

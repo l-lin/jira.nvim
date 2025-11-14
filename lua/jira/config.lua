@@ -118,6 +118,11 @@ local defaults = {
       name = "", -- Sprint name
       state = "Comment", -- Sprint state (e.g., "active", "future")
     },
+    -- Scratch window dimensions
+    scratch = {
+      width = 160,
+      height = 20,
+    },
   },
 
   keymaps = {

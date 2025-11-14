@@ -49,14 +49,15 @@ end
 ---Open markdown scratch buffer editor
 ---@param opts MarkdownEditorOpts
 local function open_markdown_editor(opts)
+  local config = require("jira.config")
   Snacks.scratch({
     ft = "markdown",
     name = opts.title,
     template = opts.template or "",
     win = {
       relative = "editor",
-      width = opts.width or 160,
-      height = opts.height or 20,
+      width = opts.width or config.options.ui.scratch.width,
+      height = opts.height or config.options.ui.scratch.height,
       title = " " .. opts.title .. " ",
       title_pos = "center",
       border = "rounded",
