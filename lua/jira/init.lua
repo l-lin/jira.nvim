@@ -3,6 +3,9 @@
 local function setup(opts)
   require("jira.config").setup(opts)
 
+  -- Setup buffer system
+  require("jira.buf").setup()
+
   -- Register with snacks.picker if available
   if package.loaded["snacks"] then
     require("jira.picker").register()

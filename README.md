@@ -10,6 +10,7 @@ Neovim plugin for browsing and managing JIRA issues with a fuzzy-finding interfa
 
 - 🔍 Fuzzy search JIRA issues and epics
 - 📝 Rich markdown previews with syntax highlighting
+- 📄 View issues in dedicated read-only buffers
 - ⚡ SQLite-based caching for fast performance
 - 🎨 Customizable UI (icons, colors, layouts)
 - ⌨️ Configurable keymaps
@@ -91,15 +92,23 @@ require("jira").setup({
 When you press `<CR>` on an issue, you get the following actions:
 
 1. **Open in browser** - Opens issue in default browser
+1. **View issue in buffer** - View issue in a dedicated read-only markdown buffer (inherits your default settings)
 1. **Start work on issue** - Assign to you, move to active sprint, transition, create git branch, yank key
 1. **Copy key** - Yanks issue key to clipboard
 1. **Transition** - Change issue status
 1. **Assign to me** - Assigns issue to you
 1. **Unassign** - Removes assignee
-1. **Move issue to spring** - Move the issue to a sprint
+1. **Move issue to sprint** - Move the issue to a sprint
 1. **Edit summary** - Edit issue title
 1. **Edit description** - Edit issue description (markdown)
 1. **Add comment** - Add comment (markdown)
+
+### Buffer View Keymaps
+
+When viewing an issue in a buffer (`jira://ISSUE-KEY`):
+
+- `<CR>` - Show actions menu
+- `q` - Close buffer
 
 ## Customization Examples
 
@@ -250,6 +259,9 @@ require("jira").open_jira_epic("PROJ-123")
 
 -- Start working on issue
 require("jira").start_working_on({ fargs = { "PROJ-123" } })
+
+-- Open issue in buffer
+require("jira.buf").open("PROJ-123")
 ```
 
 ## License

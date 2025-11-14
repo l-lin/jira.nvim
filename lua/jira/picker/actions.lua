@@ -39,6 +39,22 @@ local function action_jira_open_browser(picker, item, action)
   })
 end
 
+---View issue in buffer
+---@param picker snacks.Picker
+---@param item snacks.picker.Item
+---@param action snacks.picker.Action
+local function action_jira_view_in_buffer(picker, item, action)
+  if not validate_item_key(item) then
+    return
+  end
+
+  require("jira.buf").open(item.key)
+
+  if picker then
+    picker:close()
+  end
+end
+
 ---Copy issue key to clipboard
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
@@ -569,6 +585,13 @@ local function get_jira_actions(item, ctx)
       action = action_jira_open_browser,
     },
 
+    view_in_buffer = {
+      name = "View issue in buffer",
+      icon = " ",
+      priority = 98,
+      action = action_jira_view_in_buffer,
+    },
+
     start_work = {
       name = "Start work on issue",
       icon = " ",
@@ -642,9 +665,9 @@ local function get_jira_actions(item, ctx)
 end
 
 ---Action to show action dialog
----@param picker snacks.Picker
+---@param picker? snacks.Picker
 ---@param item snacks.picker.Item
----@param action snacks.picker.Action
+---@param action? snacks.picker.Action
 local function action_jira_list_actions(picker, item, action)
   require("snacks").picker("source_jira_actions", {
     item = item,
@@ -681,6 +704,7 @@ M.start_work_on_issue = start_work_on_issue
 
 M.action_jira_list_actions = action_jira_list_actions
 M.action_jira_open_browser = action_jira_open_browser
+M.action_jira_view_in_buffer = action_jira_view_in_buffer
 M.action_jira_copy_key = action_jira_copy_key
 M.action_jira_transition = action_jira_transition
 M.action_jira_assign_me = action_jira_assign_me

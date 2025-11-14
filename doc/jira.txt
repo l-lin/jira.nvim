@@ -31,6 +31,7 @@ https://github.com/folke/snacks.nvim/blob/main/docs/gh.md!
 Features:
   • Fuzzy search JIRA issues and epics
   • Rich markdown previews with syntax highlighting
+  • View issues in dedicated read-only buffers
   • SQLite-based caching for fast performance
   • Customizable UI (icons, colors, layouts)
   • Configurable keymaps
@@ -102,6 +103,7 @@ Using packer.nvim~
 4. Navigate and interact:
    - Use fuzzy search to find issues
    - Press <CR> to open the actions menu
+   - Select "View in buffer" to open issue in a dedicated buffer
    - Press `y` to copy the issue key
    - Press `gt` to transition the issue
 
@@ -489,15 +491,16 @@ Note: All keymaps are customizable via the |jira-keymaps| configuration.
 
 When you press <CR> on an issue, the following actions are available:
 
-1. Start work               Automate issue workflow (see below)
-2. Open in browser          Open the issue in your default browser
-3. Copy key                 Yank the issue key to clipboard
-4. Transition               Change the issue status
-5. Assign to me             Assign the issue to yourself
-6. Unassign                 Remove the assignee
-7. Edit summary             Edit the issue title
-8. Edit description         Edit the issue description (markdown editor)
-9. Add comment              Add a comment (markdown editor)
+1. Open in browser          Open the issue in your default browser
+2. View in buffer           View the issue in a dedicated buffer (see below)
+3. Start work               Automate issue workflow (see below)
+4. Copy key                 Yank the issue key to clipboard
+5. Transition               Change the issue status
+6. Assign to me             Assign the issue to yourself
+7. Unassign                 Remove the assignee
+8. Edit summary             Edit the issue title
+9. Edit description         Edit the issue description (markdown editor)
+10. Add comment             Add a comment (markdown editor)
 
 Action-specific keymaps are also available for quick access without opening
 the actions menu. See |jira-default-keymaps|.
@@ -516,6 +519,28 @@ on a JIRA issue. By default, it performs the following steps:
 
 Each step can be individually enabled or disabled via the
 |jira-action-start-work| configuration. See |jira-customization| for examples.
+
+------------------------------------------------------------------------------
+VIEW IN BUFFER ACTION                             *jira-action-view-in-buffer*
+
+The "View in Buffer" action opens the selected issue in a dedicated read-only
+markdown buffer, providing a focused view of the issue content.
+
+Usage:
+  1. Select an issue in the picker
+  2. Choose "View issue in buffer" action (or use keymap)
+
+Buffer Keymaps:
+  <CR>          Show action list
+  q             Close buffer
+
+Features:
+  • Uses the |jira://| URI scheme (e.g., jira://PROJ-123)
+  • Markdown rendering with render-markdown plugin (if installed)
+  • Cached content for faster loading
+  • Read-only to prevent accidental edits
+  • Reuses existing buffer when opening the same issue
+  • Inherits all window and buffer options from your default settings
 
 ==============================================================================
 9. Cache Management                                            *jira-cache*
@@ -648,6 +673,14 @@ A: Use the |jira-preview-comments| configuration:
       },
     })
 <
+
+Q: How do I open a JIRA issue directly in a buffer?
+A: Use the "View in buffer" action from the actions menu, or directly open a
+   buffer with:
+>lua
+    require("jira.buf").open("PROJ-123")
+<
+   The buffer uses the jira:// URI scheme and supports markdown rendering.
 
 ==============================================================================
 13. License                                                  *jira-license*
