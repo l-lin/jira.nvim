@@ -7,6 +7,8 @@ local ui = require("jira.picker.ui")
 local CLIPBOARD_REG = "+"
 local DEFAULT_REG = '"'
 
+local M = {}
+
 ---Clear issue-related caches
 ---@param issue_key string
 local function clear_issue_caches(issue_key)
@@ -31,7 +33,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function action_jira_open_browser(picker, item, action)
+function M.action_jira_open_browser(picker, item, action)
   if not validate_item_key(item) then
     return
   end
@@ -46,7 +48,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function action_jira_view_in_buffer(picker, item, action)
+function M.action_jira_view_in_buffer(picker, item, action)
   if not validate_item_key(item) then
     return
   end
@@ -62,7 +64,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function action_jira_copy_key(picker, item, action)
+function M.action_jira_copy_key(picker, item, action)
   if not validate_item_key(item) then
     return
   end
@@ -126,7 +128,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param _ snacks.picker.Action
-local function action_jira_transition(picker, item, _)
+function M.action_jira_transition(picker, item, _)
   if not validate_item_key(item) then
     return
   end
@@ -145,7 +147,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function action_jira_assign_me(picker, item, action)
+function M.action_jira_assign_me(picker, item, action)
   if not validate_item_key(item) then
     return
   end
@@ -170,7 +172,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function action_jira_unassign(picker, item, action)
+function M.action_jira_unassign(picker, item, action)
   if not validate_item_key(item) then
     return
   end
@@ -187,7 +189,7 @@ end
 
 ---Get sprints with caching
 ---@param callback fun(sprints: table[]?)
-local function get_sprints_cached(callback)
+function M.get_sprints_cached(callback)
   local cache = require("jira.cache")
 
   local cached = cache.get(cache.keys.SPRINTS)
@@ -238,12 +240,12 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param _ snacks.picker.Action
-local function action_jira_update_sprint(picker, item, _)
+function M.action_jira_update_sprint(picker, item, _)
   if not validate_item_key(item) then
     return
   end
 
-  get_sprints_cached(function(sprints)
+  M.get_sprints_cached(function(sprints)
     if not sprints or #sprints == 0 then
       vim.notify("No active or future sprints available", vim.log.levels.WARN)
       return
@@ -280,7 +282,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function action_jira_add_comment(picker, item, action)
+function M.action_jira_add_comment(picker, item, action)
   if not validate_item_key(item) then
     return
   end
@@ -299,7 +301,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function action_jira_edit_summary(picker, item, action)
+function M.action_jira_edit_summary(picker, item, action)
   if not validate_item_key(item) then
     return
   end
@@ -345,7 +347,7 @@ end
 ---@param picker snacks.Picker
 ---@paget_issue_description.Item
 ---@param action snacks.picker.Action
-local function action_jira_edit_description(picker, item, action)
+function M.action_jira_edit_description(picker, item, action)
   if not validate_item_key(item) then
     return
   end
@@ -371,7 +373,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function action_jira_refresh_cache(picker, item, action)
+function M.action_jira_refresh_cache(picker, item, action)
   require("jira.cache").clear()
   picker:refresh()
 end
@@ -381,20 +383,20 @@ end
 ---@param item snacks.picker.Item
 ---@param ctx table?
 ---@return table<string, table> actions Map of action name to action metadata
-local function get_jira_actions(item, ctx)
+function M.get_jira_actions(item, ctx)
   return {
     open_browser = {
       name = "Open issue in browser",
       icon = " ",
       priority = 100,
-      action = action_jira_open_browser,
+      action = M.action_jira_open_browser,
     },
 
     view_in_buffer = {
       name = "View issue in buffer",
       icon = " ",
       priority = 98,
-      action = action_jira_view_in_buffer,
+      action = M.action_jira_view_in_buffer,
     },
 
     start_work = {
@@ -408,28 +410,28 @@ local function get_jira_actions(item, ctx)
       name = "Copy / Yank issue key to clipboard",
       icon = " ",
       priority = 90,
-      action = action_jira_copy_key,
+      action = M.action_jira_copy_key,
     },
 
     transition = {
       name = "Edit issue status / Transition",
       icon = " ",
       priority = 80,
-      action = action_jira_transition,
+      action = M.action_jira_transition,
     },
 
     assign_me = {
       name = "Assign issue to me",
       icon = " ",
       priority = 70,
-      action = action_jira_assign_me,
+      action = M.action_jira_assign_me,
     },
 
     unassign = {
       name = "Unassign issue",
       icon = " ",
       priority = 60,
-      action = action_jira_unassign,
+      action = M.action_jira_unassign,
     },
 
     create = {
@@ -443,35 +445,35 @@ local function get_jira_actions(item, ctx)
       name = "Move issue to sprint",
       icon = " ",
       priority = 50,
-      action = action_jira_update_sprint,
+      action = M.action_jira_update_sprint,
     },
 
     edit_summary = {
       name = "Edit summary/title",
       icon = "󰏫 ",
       priority = 40,
-      action = action_jira_edit_summary,
+      action = M.action_jira_edit_summary,
     },
 
     edit_description = {
       name = "Edit description",
       icon = " ",
       priority = 30,
-      action = action_jira_edit_description,
+      action = M.action_jira_edit_description,
     },
 
     comment = {
       name = "Add comment to issue",
       icon = " ",
       priority = 20,
-      action = action_jira_add_comment,
+      action = M.action_jira_add_comment,
     },
 
     refresh = {
       name = "Refresh",
       icon = " ",
       priority = 10,
-      action = action_jira_refresh_cache,
+      action = M.action_jira_refresh_cache,
     },
   }
 end
@@ -480,7 +482,7 @@ end
 ---@param picker? snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action? snacks.picker.Action
-local function action_jira_list_actions(picker, item, action)
+function M.action_jira_list_actions(picker, item, action)
   require("snacks").picker("source_jira_actions", {
     item = item,
     confirm = function(action_picker, action_item, selected_action)
@@ -506,25 +508,12 @@ end
 
 ---Start work on issue (standalone function for command use)
 ---@param issue_key string
-local function start_work_on_issue(issue_key)
+function M.start_work_on_issue(issue_key)
   start_work_action.action_jira_start_work(nil, { key = issue_key }, nil)
 end
 
-local M = {}
-M.get_jira_actions = get_jira_actions
-M.start_work_on_issue = start_work_on_issue
-M.get_sprints_cached = get_sprints_cached
-
-M.action_jira_list_actions = action_jira_list_actions
-M.action_jira_open_browser = action_jira_open_browser
-M.action_jira_view_in_buffer = action_jira_view_in_buffer
-M.action_jira_copy_key = action_jira_copy_key
-M.action_jira_transition = action_jira_transition
-M.action_jira_assign_me = action_jira_assign_me
-M.action_jira_unassign = action_jira_unassign
-M.action_jira_update_sprint = action_jira_update_sprint
-M.action_jira_add_comment = action_jira_add_comment
-M.action_jira_refresh_cache = action_jira_refresh_cache
+-- Re-export actions from other modules
 M.action_jira_create = create_action.action_jira_create
 M.action_jira_start_work = start_work_action.action_jira_start_work
+
 return M

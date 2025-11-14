@@ -1,6 +1,8 @@
+local M = {}
+
 ---Check if current directory is a git repository
 ---@return boolean
-local function is_git_repo()
+function M.is_git_repo()
   local result = vim.system({ "git", "rev-parse", "--git-dir" }, { text = true }):wait()
   return result.code == 0
 end
@@ -8,7 +10,7 @@ end
 ---Check if branch exists
 ---@param branch_name string
 ---@return boolean
-local function branch_exists(branch_name)
+function M.branch_exists(branch_name)
   local result = vim.system({ "git", "rev-parse", "--verify", branch_name }, { text = true }):wait()
   return result.code == 0
 end
@@ -16,8 +18,8 @@ end
 ---Switch to branch (create if needed based on exists check)
 ---@param branch_name string
 ---@param callback fun(err: string?, mode: string?)
-local function switch_branch(branch_name, callback)
-  local exists = branch_exists(branch_name)
+function M.switch_branch(branch_name, callback)
+  local exists = M.branch_exists(branch_name)
   local cmd = exists and { "git", "switch", branch_name } or { "git", "switch", "-c", branch_name }
 
   vim.system(cmd, { text = true }, function(result)
@@ -31,8 +33,4 @@ local function switch_branch(branch_name, callback)
   end)
 end
 
-local M = {}
-M.is_git_repo = is_git_repo
-M.branch_exists = branch_exists
-M.switch_branch = switch_branch
 return M

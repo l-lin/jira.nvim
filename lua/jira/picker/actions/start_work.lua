@@ -4,6 +4,8 @@ local git = require("jira.git")
 local CLIPBOARD_REG = "+"
 local DEFAULT_REG = '"'
 
+local M = {}
+
 ---Validates that item has a key
 ---@param item snacks.picker.Item
 ---@return boolean valid True if item has key, false otherwise
@@ -36,7 +38,7 @@ end
 ---@param picker snacks.Picker?
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action?
-local function action_jira_start_work(picker, item, action)
+function M.action_jira_start_work(picker, item, action)
   if not validate_item_key(item) then
     return
   end
@@ -185,6 +187,4 @@ local function action_jira_start_work(picker, item, action)
   end
 end
 
-local M = {}
-M.action_jira_start_work = action_jira_start_work
 return M

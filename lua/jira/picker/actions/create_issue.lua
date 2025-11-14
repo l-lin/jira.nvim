@@ -10,6 +10,8 @@
 local cli = require("jira.cli")
 local ui = require("jira.picker.ui")
 
+local M = {}
+
 ---Show epic selection UI using Snacks picker
 ---@param callback fun(epic_key: string?)
 local function show_epic_select(callback)
@@ -203,7 +205,7 @@ end
 ---@param picker snacks.Picker
 ---@param item snacks.picker.Item
 ---@param action snacks.picker.Action
-local function action_jira_create(picker, item, action)
+function M.action_jira_create(picker, item, action)
   local state = {
     type = nil,
     summary = nil,
@@ -228,6 +230,4 @@ local function action_jira_create(picker, item, action)
   end)
 end
 
-local M = {}
-M.action_jira_create = action_jira_create
 return M

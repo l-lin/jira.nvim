@@ -1,3 +1,5 @@
+local M = {}
+
 ---Builds the configuration for the JIRA issues picker.
 ---@return snacks.picker.source The configuration for the JIRA issues picker
 local function source_jira_issues()
@@ -31,7 +33,7 @@ end
 ---Builds the configuration for the JIRA epic issues picker.
 ---@param epic_key string? the epic key
 ---@return snacks.picker.source The configuration for the JIRA epic issues picker
-local function source_jira_epic_issues(epic_key)
+function M.source_jira_epic_issues(epic_key)
   local config = require("jira.config").options
   local keymaps = config.keymaps
 
@@ -78,7 +80,7 @@ local function source_jira_epics()
       picker:close()
       if item and item.key then
         vim.schedule(function()
-          require("snacks").picker(source_jira_epic_issues(item.key))
+          require("snacks").picker(M.source_jira_epic_issues(item.key))
         end)
       end
     end,
@@ -115,10 +117,8 @@ local function source_jira_sprints()
   }
 end
 
-local M = {}
 M.source_jira_issues = source_jira_issues()
 M.source_jira_actions = source_jira_actions()
 M.source_jira_epics = source_jira_epics()
-M.source_jira_epic_issues = source_jira_epic_issues
 M.source_jira_sprints = source_jira_sprints()
 return M

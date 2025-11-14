@@ -1,3 +1,5 @@
+local M = {}
+
 -- Helper function to display the result
 ---@param ctx snacks.picker.preview.ctx
 ---@param result snacks.picker.preview.result
@@ -35,7 +37,7 @@ local function display_result(ctx, result)
 end
 
 ---@param ctx snacks.picker.preview.ctx
-local function preview_jira_issue(ctx)
+function M.preview_jira_issue(ctx)
   local item = ctx.item
 
   if not item or not item.key then
@@ -71,6 +73,4 @@ local function preview_jira_issue(ctx)
   end)
 end
 
-local M = {}
-M.preview_jira_issue = preview_jira_issue
 return M

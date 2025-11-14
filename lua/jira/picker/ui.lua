@@ -14,9 +14,11 @@
 ---@field on_submit fun(text: string, win: snacks.win)
 ---@field submit_desc string?
 
+local M = {}
+
 ---Prompt for summary/title input with validation
 ---@param opts SummaryInputOpts
-local function prompt_summary_input(opts)
+function M.prompt_summary_input(opts)
   local prompt = opts.prompt or "Issue summary: "
   local allow_empty = opts.allow_empty or false
   local skip_unchanged = opts.skip_unchanged or false
@@ -48,7 +50,7 @@ end
 
 ---Open markdown scratch buffer editor
 ---@param opts MarkdownEditorOpts
-local function open_markdown_editor(opts)
+function M.open_markdown_editor(opts)
   local config = require("jira.config")
   Snacks.scratch({
     ft = "markdown",
@@ -80,7 +82,4 @@ local function open_markdown_editor(opts)
   })
 end
 
-local M = {}
-M.prompt_summary_input = prompt_summary_input
-M.open_markdown_editor = open_markdown_editor
 return M

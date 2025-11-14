@@ -1,3 +1,5 @@
+local M = {}
+
 ---Simple CSV parser for quoted fields
 ---NOTE: This parser does not handle escaped quotes within fields (e.g., "value with \"quote\"")
 ---It's sufficient for JIRA CLI CSV output but not a general-purpose CSV parser
@@ -180,7 +182,7 @@ local function transform_epic(epic, config)
 end
 
 ---@type snacks.picker.finder
-local function get_jira_issues(opts, ctx)
+function M.get_jira_issues(opts, ctx)
   local config = require("jira.config").options
   local cli = require("jira.cli")
   local cache = require("jira.cache")
@@ -195,7 +197,7 @@ local function get_jira_issues(opts, ctx)
 end
 
 ---@type snacks.picker.finder
-local function get_jira_epics(opts, ctx)
+function M.get_jira_epics(opts, ctx)
   local config = require("jira.config").options
   local cli = require("jira.cli")
   local cache = require("jira.cache")
@@ -214,7 +216,7 @@ end
 ---@param opts snacks.picker.Config
 ---@param ctx snacks.picker.finder.ctx
 ---@return snacks.picker.finder.result
-local function get_jira_epic_issues(epic_key, opts, ctx)
+function M.get_jira_epic_issues(epic_key, opts, ctx)
   if not epic_key then
     error("epic_key is required for get_jira_epic_issues")
   end
@@ -235,7 +237,7 @@ end
 ---Gets the available actions for a JIRA issue and formats them for display in a picker.
 ---@param opts snacks.picker.finder_opts Options passed to the finder
 ---@param ctx snacks.picker.finder_context Context for the finder
-local function get_actions(opts, ctx)
+function M.get_actions(opts, ctx)
   local item = opts.item or (ctx.ctx and ctx.ctx.item) or ctx.item
 
   local actions = require("jira.picker.actions").get_jira_actions(item, ctx)
@@ -278,7 +280,7 @@ end
 ---Gets sprints from opts and formats them for display in a picker.
 ---@param opts snacks.picker.finder_opts Options passed to the finder
 ---@param ctx snacks.picker.finder_context Context for the finder
-local function get_sprints(opts, ctx)
+function M.get_sprints(opts, ctx)
   local sprints = opts.sprints or (ctx.ctx and ctx.ctx.sprints) or {}
 
   -- Sort by state ascending (active before future)
@@ -299,10 +301,4 @@ local function get_sprints(opts, ctx)
   end
 end
 
-local M = {}
-M.get_jira_issues = get_jira_issues
-M.get_jira_epics = get_jira_epics
-M.get_jira_epic_issues = get_jira_epic_issues
-M.get_actions = get_actions
-M.get_sprints = get_sprints
 return M

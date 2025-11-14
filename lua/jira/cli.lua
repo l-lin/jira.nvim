@@ -3,6 +3,8 @@
 
 local UNASSIGN_USER = "x" -- Special value used by jira-cli to unassign
 
+local M = {}
+
 --
 -- BUILD ARGUMENT FUNCTIONS
 --
@@ -189,7 +191,7 @@ end
 ---   - error_msg: string|function(result) Error notification message
 ---   - progress_msg: string Optional progress notification shown before execution
 ---   - stdin: string Optional stdin input for the command
-local function execute(args, opts)
+function M.execute(args, opts)
   vim.validate({
     args = { args, "table" },
     opts = { opts, "table", true },
@@ -246,60 +248,60 @@ end
 ---Open an issue in browser
 ---@param key string Issue key
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
-local function open_issue(key, opts)
-  execute(_build_issue_open_args(key), opts)
+function M.open_issue(key, opts)
+  M.execute(_build_issue_open_args(key), opts)
 end
 
 ---Get current user
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
-local function get_current_user(opts)
-  execute(_build_me_args(), opts)
+function M.get_current_user(opts)
+  M.execute(_build_me_args(), opts)
 end
 
 ---Transition issue to a different status
 ---@param key string Issue key
 ---@param transition string Transition name
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
-local function transition_issue(key, transition, opts)
-  execute(_build_issue_transition_args(key, transition), opts)
+function M.transition_issue(key, transition, opts)
+  M.execute(_build_issue_transition_args(key, transition), opts)
 end
 
 ---Assign issue to a user
 ---@param key string Issue key
 ---@param user string Username or account ID
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
-local function assign_issue(key, user, opts)
-  execute(_build_issue_assign_args(key, user), opts)
+function M.assign_issue(key, user, opts)
+  M.execute(_build_issue_assign_args(key, user), opts)
 end
 
 ---Unassign issue
 ---@param key string Issue key
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
-local function unassign_issue(key, opts)
-  execute(_build_issue_unassign_args(key), opts)
+function M.unassign_issue(key, opts)
+  M.execute(_build_issue_unassign_args(key), opts)
 end
 
 ---Add comment to issue
 ---@param key string Issue key
 ---@param text string Comment text
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
-local function comment_issue(key, text, opts)
-  execute(_build_issue_comment_args(key, text), opts)
+function M.comment_issue(key, text, opts)
+  M.execute(_build_issue_comment_args(key, text), opts)
 end
 
 ---Edit issue title/summary
 ---@param key string Issue key
 ---@param summary string New summary/title
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
-local function edit_issue_summary(key, summary, opts)
-  execute(_build_issue_edit_summary_args(key, summary), opts)
+function M.edit_issue_summary(key, summary, opts)
+  M.execute(_build_issue_edit_summary_args(key, summary), opts)
 end
 
 ---Get issue view (formatted output for preview)
 ---@param key string Issue key
 ---@param comments_count number Number of comments to include
 ---@param callback fun(result: table) Callback with vim.system result
-local function view_issue(key, comments_count, callback)
+function M.view_issue(key, comments_count, callback)
   local config = require("jira.config").options
   local cmd = { config.cli.cmd }
   vim.list_extend(cmd, _build_issue_view_args(key, comments_count))
@@ -314,7 +316,7 @@ end
 ---Get issue description
 ---@param key string Issue key
 ---@param callback fun(description: string?) Callback with description or nil on error
-local function get_issue_description(key, callback)
+function M.get_issue_description(key, callback)
   local config = require("jira.config").options
   local cmd = { config.cli.cmd }
   vim.list_extend(cmd, _build_issue_view_raw_args(key))
@@ -353,16 +355,16 @@ end
 ---@param key string Issue key
 ---@param description string New description
 ---@param opts table? Options table with callbacks and messages
-local function edit_issue_description(key, description, opts)
+function M.edit_issue_description(key, description, opts)
   opts = opts or {}
   opts.stdin = description
-  execute(_build_issue_edit_description_args(key), opts)
+  M.execute(_build_issue_edit_description_args(key), opts)
 end
 
 ---Get available transitions for an issue
 ---@param issue_key string
 ---@param callback fun(transitions: string[]?)
-local function get_transitions(issue_key, callback)
+function M.get_transitions(issue_key, callback)
   local config = require("jira.config").options
 
   -- NOTE: jira-cli doesn't provide a non-interactive way to list transitions,
@@ -418,7 +420,7 @@ end
 
 ---Get available sprints
 ---@param callback fun(sprints: table[]?) Callback with array of {id, name, state} or nil on error
-local function get_sprints(callback)
+function M.get_sprints(callback)
   local config = require("jira.config").options
   local cmd = { config.cli.cmd }
   vim.list_extend(cmd, _build_sprint_list_for_selection_args())
@@ -453,8 +455,8 @@ end
 ---@param issue_key string Issue key
 ---@param sprint_id string Sprint ID
 ---@param opts table? Options for execute (success_msg, error_msg, callbacks)
-local function move_issue_to_sprint(issue_key, sprint_id, opts)
-  execute(_build_sprint_add_issue_args(sprint_id, issue_key), opts)
+function M.move_issue_to_sprint(issue_key, sprint_id, opts)
+  M.execute(_build_sprint_add_issue_args(sprint_id, issue_key), opts)
 end
 
 ---Build args for creating issue
@@ -485,7 +487,7 @@ end
 ---@param description string?
 ---@param parent_key string?
 ---@param opts table Options with on_success callback receiving (result, issue_key)
-local function create_issue(issue_type, summary, description, parent_key, opts)
+function M.create_issue(issue_type, summary, description, parent_key, opts)
   local args = _build_issue_create_args(issue_type, summary, description, parent_key)
 
   -- Wrap on_success to parse issue key from output
@@ -501,47 +503,26 @@ local function create_issue(issue_type, summary, description, parent_key, opts)
     end
   end
 
-  execute(args, opts)
+  M.execute(args, opts)
 end
 
 ---Get sprint list arguments (for finders)
 ---@return table args command arguments for sprint list query
-local function get_sprint_list_args()
+function M.get_sprint_list_args()
   return _build_sprint_list_args()
 end
 
 ---Get epic list arguments (for finders)
 ---@return table args command arguments for epic list query
-local function get_epic_list_args()
+function M.get_epic_list_args()
   return _build_epic_list_args()
 end
 
 ---Get epic issues arguments (for finders)
 ---@param epic_key string Epic key (e.g., "PROJ-123")
 ---@return table args command arguments for epic issues query
-local function get_epic_issues_args(epic_key)
+function M.get_epic_issues_args(epic_key)
   return _build_epic_issues_args(epic_key)
 end
 
-local M = {}
-M.execute = execute
-M.get_sprint_list_args = get_sprint_list_args
-M.get_epic_list_args = get_epic_list_args
-M.get_epic_issues_args = get_epic_issues_args
-
--- Execute actions
-M.open_issue = open_issue
-M.get_current_user = get_current_user
-M.transition_issue = transition_issue
-M.assign_issue = assign_issue
-M.unassign_issue = unassign_issue
-M.comment_issue = comment_issue
-M.edit_issue_summary = edit_issue_summary
-M.view_issue = view_issue
-M.get_issue_description = get_issue_description
-M.edit_issue_description = edit_issue_description
-M.get_transitions = get_transitions
-M.get_sprints = get_sprints
-M.move_issue_to_sprint = move_issue_to_sprint
-M.create_issue = create_issue
 return M

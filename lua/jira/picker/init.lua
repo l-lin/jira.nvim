@@ -1,4 +1,6 @@
-local function register()
+local M = {}
+
+function M.register()
   local snacks = require("snacks")
 
   -- Register formatters
@@ -31,6 +33,4 @@ local function register()
   end
 end
 
-local M = {}
-M.register = register
 return M

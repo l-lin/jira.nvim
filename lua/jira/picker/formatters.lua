@@ -1,3 +1,5 @@
+local M = {}
+
 -- Pad string to fixed display width (handles multi-byte chars)
 local function pad_to_width(str, width)
   local display_width = vim.fn.strdisplaywidth(str)
@@ -11,7 +13,7 @@ end
 ---@param item snacks.picker.Item
 ---@param picker snacks.Picker
 ---@return snacks.picker.Highlight[]
-local function format_jira_issues(item, picker)
+function M.format_jira_issues(item, picker)
   local ret = {}
 
   -- Type badge with icon (more compact)
@@ -62,7 +64,7 @@ end
 ---@param item snacks.picker.Item
 ---@param picker snacks.Picker
 ---@return snacks.picker.Highlight[]
-local function format_jira_action(item, picker)
+function M.format_jira_action(item, picker)
   local ret = {}
   local config = require("jira.config").options
   local action_hl = config.ui.action_highlights
@@ -86,7 +88,7 @@ end
 ---@param item snacks.picker.Item
 ---@param picker snacks.Picker
 ---@return snacks.picker.Highlight[]
-local function format_jira_epics(item, picker)
+function M.format_jira_epics(item, picker)
   local ret = {}
   local config = require("jira.config").options
 
@@ -119,7 +121,7 @@ end
 ---@param item snacks.picker.Item
 ---@param picker snacks.Picker
 ---@return snacks.picker.Highlight[]
-local function format_jira_sprint(item, picker)
+function M.format_jira_sprint(item, picker)
   local ret = {}
   local config = require("jira.config").options
   local sprint_hl = config.ui.sprint_highlights
@@ -142,9 +144,4 @@ local function format_jira_sprint(item, picker)
   return ret
 end
 
-local M = {}
-M.format_jira_issues = format_jira_issues
-M.format_jira_action = format_jira_action
-M.format_jira_epics = format_jira_epics
-M.format_jira_sprint = format_jira_sprint
 return M

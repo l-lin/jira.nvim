@@ -2,6 +2,9 @@
 
 local db = nil
 
+---@class jira.cache
+local M = {}
+
 ---Get cache file path from config
 ---@return string
 local function get_cache_path()
@@ -77,7 +80,7 @@ end
 ---Clear cached data for a query (or all if no query_type specified)
 ---@param query_type? string Type of query to clear (nil = clear all)
 ---@param params? table Optional parameters (nil = clear all with matching query_type prefix)
-local function clear(query_type, params)
+function M.clear(query_type, params)
   local database = init_db()
   if not database then
     return
@@ -104,7 +107,7 @@ end
 ---@param query_type string Type of query
 ---@param params? table Optional parameters
 ---@return table? items Cached items or nil if not found/expired
-local function get(query_type, params)
+function M.get(query_type, params)
   local config = require("jira.config").options
   if not config.cache.enabled then
     if config.debug then
@@ -141,7 +144,7 @@ local function get(query_type, params)
         vim.notify(string.format("[JIRA Cache] Invalid JSON for key: %s", key), vim.log.levels.WARN)
       end
       -- Invalid JSON, clear this entry
-      clear(query_type, params)
+      M.clear(query_type, params)
       return nil
     end
 
@@ -168,7 +171,7 @@ end
 ---@param query_type string Type of query
 ---@param params? table Optional parameters
 ---@param items table Items to cache
-local function set(query_type, params, items)
+function M.set(query_type, params, items)
   local config = require("jira.config").options
   if not config.cache.enabled then
     return
@@ -202,7 +205,7 @@ local function set(query_type, params, items)
 end
 
 ---Close the database connection
-local function close()
+function M.close()
   if db then
     db:close()
     db = nil
@@ -213,15 +216,9 @@ end
 local group = vim.api.nvim_create_augroup("jira_cache", {})
 vim.api.nvim_create_autocmd("ExitPre", {
   group = group,
-  callback = close,
+  callback = M.close,
 })
 
----@class jira.cache
-local M = {}
-M.get = get
-M.set = set
-M.clear = clear
-M.close = close
 M.keys = {
   ISSUES = "issues",
   EPICS = "epics",

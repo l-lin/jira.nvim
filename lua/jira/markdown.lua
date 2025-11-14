@@ -1,3 +1,5 @@
+local M = {}
+
 ---Strip ANSI color codes from text
 ---@param text string
 ---@return string
@@ -283,7 +285,7 @@ end
 ---Convert ADF (Atlassian Document Format) to plain text
 ---@param adf table ADF document structure
 ---@return string Plain text content
-local function adf_to_markdown(adf)
+function M.adf_to_markdown(adf)
   local lines = {}
 
   local function extract_from_node(node)
@@ -330,7 +332,7 @@ end
 ---Convert JIRA issue plain text to markdown
 ---@param text string Plain text with ANSI codes
 ---@return string[] Markdown formatted lines
-local function format_issue(text)
+function M.format_issue(text)
   -- Strip ANSI codes and split into lines
   local clean_text = strip_ansi_codes(text)
   local lines = vim.split(clean_text, "\n", { trimempty = false })
@@ -339,7 +341,7 @@ local function format_issue(text)
   return plain_to_markdown(lines)
 end
 
-local M = {}
+-- Export test helpers
 M._strip_ansi_codes = strip_ansi_codes
 M._trim_line = trim_line
 M._is_code_line = is_code_line
@@ -349,6 +351,4 @@ M._format_section_header = format_section_header
 M._process_header = process_header
 M._plain_to_markdown = plain_to_markdown
 
-M.adf_to_markdown = adf_to_markdown
-M.format_issue = format_issue
 return M

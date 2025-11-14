@@ -1,6 +1,8 @@
+local M = {}
+
 --- Setup plugin with user configuration
 ---@param opts jira.Config?
-local function setup(opts)
+function M.setup(opts)
   require("jira.config").setup(opts)
 
   -- Setup buffer system
@@ -14,7 +16,7 @@ end
 
 --- Open issues picker
 ---@param opts table? Picker options
-local function open_jira_issues(opts)
+function M.open_jira_issues(opts)
   if not package.loaded["snacks"] then
     vim.notify("jira.nvim requires snacks.nvim", vim.log.levels.ERROR)
     return
@@ -29,7 +31,7 @@ end
 
 --- Open epic picker or epic issues picker
 ---@param opts table? Command options (from nvim_create_user_command)
-local function open_jira_epic(opts)
+function M.open_jira_epic(opts)
   if not package.loaded["snacks"] then
     vim.notify("jira.nvim requires snacks.nvim", vim.log.levels.ERROR)
     return
@@ -54,7 +56,7 @@ end
 
 --- Start working on issue (assign, sprint, transition, git branch, yank)
 ---@param opts table? Command options (from nvim_create_user_command)
-local function start_working_on(opts)
+function M.start_working_on(opts)
   opts = opts or {}
   local issue_key = opts.fargs and opts.fargs[1]
 
@@ -67,9 +69,4 @@ local function start_working_on(opts)
   actions.start_work_on_issue(issue_key)
 end
 
-local M = {}
-M.setup = setup
-M.open_jira_issues = open_jira_issues
-M.open_jira_epic = open_jira_epic
-M.start_working_on = start_working_on
 return M
