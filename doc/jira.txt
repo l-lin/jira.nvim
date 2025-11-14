@@ -503,7 +503,7 @@ Action-specific keymaps are also available for quick access without opening
 the actions menu. See |jira-default-keymaps|.
 
 ------------------------------------------------------------------------------
-START WORK ACTION                                   *jira-action-start-work*
+START WORK ACTION                                   *jira-start-work*
 
 The "Start Work" action automates common workflow steps when beginning work
 on a JIRA issue. By default, it performs the following steps:
