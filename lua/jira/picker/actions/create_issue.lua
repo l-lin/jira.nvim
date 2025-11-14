@@ -10,6 +10,25 @@
 local cli = require("jira.cli")
 local ui = require("jira.picker.ui")
 
+---Get issue types with caching
+---@param callback fun(transitions: string[]?)
+local function get_issue_types_cached(callback)
+  local cache = require("jira.cache")
+
+  local cached = cache.get(cache.keys.ISSUE_TYPES, nil)
+  if cached and cached.items then
+    callback(cached.items)
+    return
+  end
+
+  cli.get_issue_types(function(issue_types)
+    if issue_types and #issue_types > 0 then
+      cache.set(cache.keys.ISSUE_TYPES, nil, issue_types)
+    end
+    callback(issue_types)
+  end)
+end
+
 local M = {}
 
 ---Show epic selection UI using Snacks picker
@@ -43,18 +62,17 @@ end
 ---@param state CreateIssueState
 ---@param on_complete fun(state: CreateIssueState)
 local function step_1_select_type(state, on_complete)
-  -- TODO: dynamically find the issue types
-  local issue_types = { "Bug", "Story", "Task", "Epic" }
+  get_issue_types_cached(function(issue_types)
+    vim.ui.select(issue_types, {
+      prompt = "Select issue type:",
+    }, function(selected_type)
+      if not selected_type then
+        return -- User cancelled
+      end
 
-  vim.ui.select(issue_types, {
-    prompt = "Select issue type:",
-  }, function(selected_type)
-    if not selected_type then
-      return -- User cancelled
-    end
-
-    state.type = selected_type
-    on_complete(state)
+      state.type = selected_type
+      on_complete(state)
+    end)
   end)
 end
 

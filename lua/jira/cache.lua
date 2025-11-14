@@ -226,5 +226,6 @@ M.keys = {
   ISSUE_VIEW = "issue_view",
   TRANSITIONS = "transitions",
   SPRINTS = "sprints",
+  ISSUE_TYPES = "issue_types",
 }
 return M

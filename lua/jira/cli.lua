@@ -178,6 +178,12 @@ local function _build_sprint_add_issue_args(sprint_id, issue_key)
   return { "sprint", "add", sprint_id, issue_key }
 end
 
+---Build arguments for listing available issue types (interactive prompt)
+---@return table args command arguments
+local function _build_issue_list_issue_types_args()
+  return { "issue", "create" }
+end
+
 --
 -- EXECUTION FUNCTIONS
 --
@@ -361,20 +367,18 @@ function M.edit_issue_description(key, description, opts)
   M.execute(_build_issue_edit_description_args(key), opts)
 end
 
----Get available transitions for an issue
----@param issue_key string
----@param callback fun(transitions: string[]?)
-function M.get_transitions(issue_key, callback)
+---Scrape interactive prompt options from jira-cli
+---@param args table CLI arguments
+---@param callback fun(options: string[]?)
+local function _get_interactive_options(args, callback)
   local config = require("jira.config").options
 
-  -- NOTE: jira-cli doesn't provide a non-interactive way to list transitions,
-  -- so we scrape the interactive prompt output by spawning the command,
-  -- capturing stdout, then killing it before it waits for user input
   local stdout_chunks = {}
   local cmd = { config.cli.cmd }
-  vim.list_extend(cmd, _build_issue_list_transitions_args(issue_key))
+  vim.list_extend(cmd, args)
   local job_id = vim.fn.jobstart(cmd, {
     stdout_buffered = false,
+    pty = true,
     on_stdout = function(_, data, _)
       for _, line in ipairs(data) do
         if line ~= "" then
@@ -383,27 +387,28 @@ function M.get_transitions(issue_key, callback)
       end
     end,
     on_exit = function()
-      -- Process terminated, parse output
       local output = table.concat(stdout_chunks, "\n")
 
-      -- Parse transitions from the interactive prompt
-      -- Format: "  State Name" or "> State Name" (for selected)
-      local transitions = {}
+      -- Parse options from interactive prompt
+      -- Format: "  Option Name" or "> Option Name" (for selected)
+      local seen = {}
+      local options = {}
       for line in output:gmatch("[^\r\n]+") do
         -- Strip ANSI escape codes
         local cleaned = line:gsub("\27%[[%d;]*m", "")
         -- Match lines that start with spaces or >
-        local state = cleaned:match("^%s+(.+)$") or cleaned:match("^>%s*(.+)$")
-        if state and state ~= "" then
+        local option = cleaned:match("^%s+(.+)$") or cleaned:match("^>%s*(.+)$")
+        if option and option ~= "" then
           -- Trim whitespace
-          state = state:match("^%s*(.-)%s*$")
-          if state ~= "" then
-            table.insert(transitions, state)
+          option = option:match("^%s*(.-)%s*$")
+          if option ~= "" and not seen[option] then
+            seen[option] = true
+            table.insert(options, option)
           end
         end
       end
 
-      callback(#transitions > 0 and transitions or nil)
+      callback(#options > 0 and options or nil)
     end,
   })
 
@@ -412,10 +417,23 @@ function M.get_transitions(issue_key, callback)
     return
   end
 
-  -- Give it a moment to output the prompt, then kill it
+  -- Wait for prompt to render, then scroll through all options
   vim.defer_fn(function()
-    vim.fn.jobstop(job_id)
-  end, 500)
+    for _ = 1, 20 do
+      vim.fn.chansend(job_id, "\27[B") -- Down arrow
+    end
+    -- Give it time to render, then kill
+    vim.defer_fn(function()
+      vim.fn.jobstop(job_id)
+    end, 200)
+  end, 300)
+end
+
+---Get available transitions for an issue
+---@param issue_key string
+---@param callback fun(transitions: string[]?)
+function M.get_transitions(issue_key, callback)
+  _get_interactive_options(_build_issue_list_transitions_args(issue_key), callback)
 end
 
 ---Get available sprints
@@ -523,6 +541,12 @@ end
 ---@return table args command arguments for epic issues query
 function M.get_epic_issues_args(epic_key)
   return _build_epic_issues_args(epic_key)
+end
+
+---Get available issue types
+---@param callback fun(issue_types: string[]?)
+function M.get_issue_types(callback)
+  _get_interactive_options(_build_issue_list_issue_types_args(), callback)
 end
 
 return M
