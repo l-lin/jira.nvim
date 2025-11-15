@@ -5,9 +5,15 @@
 ---@field order_by string Sort order field
 ---@field prefill_search string? Prefill the picker search input field
 
+---@class jira.TimeoutConfig
+---@field interactive_initial number Milliseconds to wait for interactive prompt to render (default: 300)
+---@field interactive_render number Milliseconds to wait after scrolling before killing job (default: 200)
+---@field issue_open_delay number Milliseconds to wait before opening newly created issue (default: 500)
+
 ---@class jira.CliConfig
 ---@field cmd string Path to jira CLI binary
 ---@field config_path string Path to jira CLI config file
+---@field timeout jira.TimeoutConfig Timeout settings for various operations
 ---@field issues jira.QueryConfig Query settings for sprint issues
 ---@field epics jira.QueryConfig Query settings for epics
 ---@field epic_issues jira.QueryConfig Query settings for epic issues

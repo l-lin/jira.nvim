@@ -223,12 +223,13 @@ local function step_6_create_issue(state)
       vim.notify(string.format("Created issue: %s", issue_key), vim.log.levels.INFO)
 
       -- Open in buffer with delay to ensure issue is available
+      local config = require("jira.config").options
       vim.defer_fn(function()
         require("jira.buf").open(issue_key)
         if state.picker then
           state.picker:close()
         end
-      end, 500)
+      end, config.cli.timeout.issue_open_delay)
     end,
   })
 end

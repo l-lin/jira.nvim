@@ -7,6 +7,13 @@ local defaults = {
     -- Path to jira CLI config file
     config_path = "~/.config/.jira/.config.yml",
 
+    -- Timeout settings for various operations (increase for slow Jira servers)
+    timeout = {
+      interactive_initial = 300, -- ms to wait for interactive prompt to render
+      interactive_render = 200, -- ms to wait after scrolling before killing job
+      issue_open_delay = 500, -- ms to wait before opening newly created issue
+    },
+
     -- Configuration for fetching current sprint issues
     issues = {
       args = { "sprint", "list", "--current" },

@@ -459,8 +459,8 @@ local function _get_interactive_options(args, callback)
     -- Give it time to render, then kill
     vim.defer_fn(function()
       vim.fn.jobstop(job_id)
-    end, 200)
-  end, 300)
+    end, config.cli.timeout.interactive_render)
+  end, config.cli.timeout.interactive_initial)
 end
 
 ---Get available transitions for an issue
