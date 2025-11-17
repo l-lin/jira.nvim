@@ -5,6 +5,24 @@ local UNASSIGN_USER = "x" -- Special value used by jira-cli to unassign
 
 local M = {}
 
+---Format command array as shell-escaped string for debug display
+---@param cmd table Command array (e.g., {"jira", "issue", "create", "-s", "title with spaces"})
+---@return string formatted Shell-escaped command string
+local function _format_command_for_display(cmd)
+  local formatted = {}
+  for _, arg in ipairs(cmd) do
+    -- Quote if contains spaces, tabs, or special shell characters
+    if arg:match("[%s'\"`$\\!*?%[%]%(%){}|&;<>]") then
+      -- Escape single quotes by replacing ' with '\''
+      local escaped = arg:gsub("'", "'\\''")
+      table.insert(formatted, "'" .. escaped .. "'")
+    else
+      table.insert(formatted, arg)
+    end
+  end
+  return table.concat(formatted, " ")
+end
+
 --
 -- BUILD ARGUMENT FUNCTIONS
 --
@@ -26,8 +44,9 @@ local function _build_sprint_list_args()
   vim.list_extend(args, { "--csv", "--columns", table.concat(config.cli.issues.columns, ",") })
 
   if config.debug then
-    local cmd_str = config.cli.cmd .. " " .. table.concat(args, " ")
-    vim.notify("JIRA CLI Command:\n" .. cmd_str, vim.log.levels.INFO)
+    local cmd = { config.cli.cmd }
+    vim.list_extend(cmd, args)
+    vim.notify("JIRA CLI Command:\n" .. _format_command_for_display(cmd), vim.log.levels.INFO)
   end
 
   return args
@@ -50,8 +69,9 @@ local function _build_epic_list_args()
   vim.list_extend(args, { "--csv", "--columns", table.concat(config.cli.epics.columns, ",") })
 
   if config.debug then
-    local cmd_str = config.cli.cmd .. " " .. table.concat(args, " ")
-    vim.notify("JIRA CLI Command:\n" .. cmd_str, vim.log.levels.INFO)
+    local cmd = { config.cli.cmd }
+    vim.list_extend(cmd, args)
+    vim.notify("JIRA CLI Command:\n" .. _format_command_for_display(cmd), vim.log.levels.INFO)
   end
 
   return args
@@ -76,8 +96,9 @@ local function _build_epic_issues_args(epic_key)
   vim.list_extend(args, { "--csv", "--columns", table.concat(config.cli.epic_issues.columns, ",") })
 
   if config.debug then
-    local cmd_str = config.cli.cmd .. " " .. table.concat(args, " ")
-    vim.notify("JIRA CLI Command:\n" .. cmd_str, vim.log.levels.INFO)
+    local cmd = { config.cli.cmd }
+    vim.list_extend(cmd, args)
+    vim.notify("JIRA CLI Command:\n" .. _format_command_for_display(cmd), vim.log.levels.INFO)
   end
 
   return args
@@ -233,7 +254,7 @@ function M.execute(args, opts)
   vim.list_extend(cmd, args)
 
   if config.debug then
-    vim.notify("JIRA CLI Command:\n" .. table.concat(cmd, " "), vim.log.levels.INFO)
+    vim.notify("JIRA CLI Command:\n" .. _format_command_for_display(cmd), vim.log.levels.INFO)
   end
 
   -- Prepare system options

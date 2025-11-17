@@ -264,6 +264,107 @@ describe("cli", function()
 
       assert.is_true(system_called)
     end)
+
+    describe("debug output formatting", function()
+      it("should quote arguments with spaces", function()
+        package.loaded["jira.config"].options.debug = true
+
+        cli = require("jira.cli")
+        cli.execute({ "issue", "create", "-s", "title with spaces" })
+
+        assert.is_true(notify_called)
+        assert.is_true(notify_message:match("'title with spaces'") ~= nil)
+      end)
+
+      it("should quote arguments with brackets", function()
+        package.loaded["jira.config"].options.debug = true
+
+        cli = require("jira.cli")
+        cli.execute({ "issue", "create", "-s", "[PROJ] some title" })
+
+        assert.is_true(notify_called)
+        assert.is_true(notify_message:match("'%[PROJ%] some title'") ~= nil)
+      end)
+
+      it("should quote arguments with backticks", function()
+        package.loaded["jira.config"].options.debug = true
+
+        cli = require("jira.cli")
+        cli.execute({ "issue", "create", "-b", "description with `code`" })
+
+        assert.is_true(notify_called)
+        assert.is_true(notify_message:match("'description with `code`'") ~= nil)
+      end)
+
+      it("should not quote arguments without special characters", function()
+        package.loaded["jira.config"].options.debug = true
+
+        cli = require("jira.cli")
+        cli.execute({ "issue", "view", "PROJ-123" })
+
+        assert.is_true(notify_called)
+        -- PROJ-123 should not be quoted
+        assert.is_false(notify_message:match("'PROJ%-123'") ~= nil)
+        assert.is_true(notify_message:match("PROJ%-123") ~= nil)
+      end)
+
+      it("should properly escape single quotes in arguments", function()
+        package.loaded["jira.config"].options.debug = true
+
+        cli = require("jira.cli")
+        cli.execute({ "issue", "create", "-b", "description with 'quotes'" })
+
+        assert.is_true(notify_called)
+        -- Single quotes should be escaped as '\''
+        assert.is_true(notify_message:match("'description with '\\''quotes'\\'''") ~= nil)
+      end)
+
+      it("should quote arguments with parentheses", function()
+        package.loaded["jira.config"].options.debug = true
+
+        cli = require("jira.cli")
+        cli.execute({ "issue", "create", "-s", "title (with parens)" })
+
+        assert.is_true(notify_called)
+        assert.is_true(notify_message:match("'title %(with parens%)'") ~= nil)
+      end)
+
+      it("should quote arguments with special shell characters", function()
+        package.loaded["jira.config"].options.debug = true
+
+        cli = require("jira.cli")
+        cli.execute({ "issue", "create", "-s", "title $with &special |chars" })
+
+        assert.is_true(notify_called)
+        assert.is_true(notify_message:match("'title %$with &special |chars'") ~= nil)
+      end)
+
+      it("should format complete command properly", function()
+        package.loaded["jira.config"].options.debug = true
+
+        cli = require("jira.cli")
+        cli.execute({
+          "issue",
+          "create",
+          "-t",
+          "Task",
+          "-s",
+          "[PAAC] refactor aggregate root and entities",
+          "--no-input",
+          "-b",
+          "Following some guidelines, we can refactor our aggregate root `Subscription` to be mutable.",
+        })
+
+        assert.is_true(notify_called)
+        -- Check that title is quoted
+        assert.is_true(notify_message:match("'%[PAAC%] refactor aggregate root and entities'") ~= nil)
+        -- Check that description is quoted
+        assert.is_true(notify_message:match("'Following some guidelines") ~= nil)
+        -- Check that simple args are not quoted
+        assert.is_true(notify_message:match("%-t Task") ~= nil)
+        assert.is_true(notify_message:match("%-%-no%-input") ~= nil)
+      end)
+    end)
   end)
 
   describe("get_sprint_list_args", function()
