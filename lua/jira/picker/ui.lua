@@ -1,7 +1,7 @@
----@class SummaryInputOpts
+---@class TextInputOpts
 ---@field prompt string?
 ---@field default string?
----@field on_submit fun(summary: string)
+---@field on_submit fun(input: string)
 ---@field on_cancel fun()?
 ---@field allow_empty boolean?
 ---@field skip_unchanged boolean?
@@ -16,10 +16,10 @@
 
 local M = {}
 
----Prompt for summary/title input with validation
----@param opts SummaryInputOpts
-function M.prompt_summary_input(opts)
-  local prompt = opts.prompt or "Issue summary: "
+---Prompt for text input with validation
+---@param opts TextInputOpts
+function M.prompt_text_input(opts)
+  local prompt = opts.prompt or "Input: "
   local allow_empty = opts.allow_empty or false
   local skip_unchanged = opts.skip_unchanged or false
 
@@ -29,7 +29,7 @@ function M.prompt_summary_input(opts)
   }, function(input)
     if not input or input == "" then
       if not allow_empty then
-        vim.notify("Summary is required", vim.log.levels.WARN)
+        vim.notify("Input is required", vim.log.levels.WARN)
       end
       if opts.on_cancel then
         opts.on_cancel()
@@ -45,6 +45,11 @@ function M.prompt_summary_input(opts)
     end
 
     opts.on_submit(input)
+  end)
+
+  -- Start in insert mode at the end of the line
+  vim.schedule(function()
+    vim.cmd("startinsert!")
   end)
 end
 

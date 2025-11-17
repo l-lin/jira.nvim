@@ -12,7 +12,8 @@ local M = {}
 function M.action_jira_edit_summary(picker, item, action)
   local current_title = item.summary or ""
 
-  ui.prompt_summary_input({
+  ui.prompt_text_input({
+    prompt = "Issue summary: ",
     default = current_title,
     skip_unchanged = true,
     on_submit = function(new_title)

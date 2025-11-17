@@ -61,6 +61,11 @@ local metadata = {
     icon = "󱐋 ",
     priority = 46,
   },
+  add_labels = {
+    name = "Add/edit labels",
+    icon = "󰌕 ",
+    priority = 45,
+  },
   edit_summary = {
     name = "Edit summary/title",
     icon = "󰏫 ",

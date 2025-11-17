@@ -193,6 +193,22 @@ local function _build_issue_edit_description_args(key)
   return { "issue", "edit", key, "--no-input" }
 end
 
+---Build arguments for editing issue labels
+---@param key string Issue key
+---@param labels string[] Array of label strings
+---@return table args command arguments
+local function _build_issue_edit_labels_args(key, labels)
+  local args = { "issue", "edit", key }
+
+  for _, label in ipairs(labels) do
+    table.insert(args, "-l")
+    table.insert(args, label)
+  end
+
+  table.insert(args, "--no-input")
+  return args
+end
+
 ---Build arguments for viewing an issue
 ---@param key string Issue key
 ---@param comments_count number Number of comments to include
@@ -420,6 +436,14 @@ function M.edit_issue_description(key, description, opts)
   opts = opts or {}
   opts.stdin = description
   M.execute(_build_issue_edit_description_args(key), opts)
+end
+
+---Edit issue labels
+---@param key string Issue key
+---@param labels string[] Array of label strings
+---@param opts table? Options for execute (success_msg, error_msg, callbacks)
+function M.edit_issue_labels(key, labels, opts)
+  M.execute(_build_issue_edit_labels_args(key, labels), opts)
 end
 
 ---Scrape interactive prompt options from jira-cli

@@ -104,6 +104,7 @@ When you press `<CR>` on an issue, you get the following actions:
 1. **Move issue to sprint** - Move the issue to a sprint
 1. **Add issue to epic** - Link the issue to a parent epic
 1. **Remove issue from epic** - Unlink the issue from its epic
+1. **Add/edit labels** - Add or modify issue labels (comma-separated)
 1. **Edit summary** - Edit issue title
 1. **Edit description** - Edit issue description (markdown)
 1. **Add comment** - Add comment (markdown)

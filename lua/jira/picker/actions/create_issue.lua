@@ -90,7 +90,8 @@ end
 ---@param state CreateIssueState
 ---@param on_complete fun(state: CreateIssueState)
 local function step_2_input_summary(state, on_complete)
-  ui.prompt_summary_input({
+  ui.prompt_text_input({
+    prompt = "Issue summary: ",
     on_submit = function(summary)
       state.summary = summary
       on_complete(state)

@@ -540,9 +540,10 @@ When you press <CR> on an issue, the following actions are available:
 10. Move issue to sprint    Move the issue to a sprint
 11. Add issue to epic       Link the issue to a parent epic
 12. Remove issue from epic  Unlink the issue from its epic
-13. Edit summary            Edit the issue title
-14. Edit description        Edit the issue description (markdown editor)
-15. Add comment             Add a comment (markdown editor)
+13. Add/edit labels         Add or modify issue labels (comma-separated)
+14. Edit summary            Edit the issue title
+15. Edit description        Edit the issue description (markdown editor)
+16. Add comment             Add a comment (markdown editor)
 
 Action-specific keymaps are also available for quick access without opening
 the actions menu. See |jira-default-keymaps|.
