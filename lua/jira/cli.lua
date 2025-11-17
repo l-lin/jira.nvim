@@ -532,23 +532,33 @@ function M.move_issue_to_sprint(issue_key, sprint_id, opts)
   M.execute(_build_sprint_add_issue_args(sprint_id, issue_key), opts)
 end
 
+---Build arguments for adding issue to epic
+---@param epic_key string Epic key
+---@param issue_key string Issue key
+---@return table args command arguments
+local function _build_epic_add_args(epic_key, issue_key)
+  return { "epic", "add", epic_key, issue_key }
+end
+
+---Add issue to epic
+---@param epic_key string Epic key
+---@param issue_key string Issue key
+---@param opts table? Options for execute (success_msg, error_msg, callbacks)
+function M.add_issue_to_epic(epic_key, issue_key, opts)
+  M.execute(_build_epic_add_args(epic_key, issue_key), opts)
+end
+
 ---Build args for creating issue
 ---@param issue_type string Type (Bug, Story, Task, Epic, etc.)
 ---@param summary string Issue title
 ---@param description string? Issue description (optional)
----@param parent_key string? Parent epic key (optional)
 ---@return table args CLI arguments
-local function _build_issue_create_args(issue_type, summary, description, parent_key)
+local function _build_issue_create_args(issue_type, summary, description)
   local args = { "issue", "create", "-t", issue_type, "-s", summary, "--no-input" }
 
   if description and description ~= "" then
     table.insert(args, "-b")
     table.insert(args, description)
-  end
-
-  if parent_key and parent_key ~= "" then
-    table.insert(args, "-P")
-    table.insert(args, parent_key)
   end
 
   return args
@@ -558,16 +568,15 @@ end
 ---@param issue_type string
 ---@param summary string
 ---@param description string?
----@param parent_key string?
 ---@param opts table Options with on_success callback receiving (result, issue_key)
-function M.create_issue(issue_type, summary, description, parent_key, opts)
-  local args = _build_issue_create_args(issue_type, summary, description, parent_key)
+function M.create_issue(issue_type, summary, description, opts)
+  local args = _build_issue_create_args(issue_type, summary, description)
 
   -- Wrap on_success to parse issue key from output
   local original_on_success = opts.on_success
   opts.on_success = function(result, _)
     -- Parse issue key from output (format: "Issue created: PROJ-123" or JSON with --raw)
-    local issue_key = result.stdout:match("([A-Z]+-[0-9]+)")
+    local issue_key = result.stdout:match("([A-Z0-9]+-[0-9]+)")
 
     if issue_key and original_on_success then
       original_on_success(result, issue_key)

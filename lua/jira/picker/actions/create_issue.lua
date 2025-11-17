@@ -34,8 +34,6 @@ end
 ---Show epic selection UI using Snacks picker
 ---@param callback fun(epic_key: string?)
 local function show_epic_select(callback)
-  local sources = require("jira.picker.sources")
-
   require("snacks").picker("source_jira_epics", {
     ---@diagnostic disable-next-line: unused-local
     confirm = function(epic_picker, epic_item, action)
@@ -148,7 +146,7 @@ end
 local function step_5_select_sprint(state, on_complete)
   vim.ui.select(
     { "Yes", "No" },
-    { prompt = "Move to active sprint?" },
+    { prompt = "Move to sprint?" },
     function(sprint_choice)
       if not sprint_choice then
         if state.scratch_win then
@@ -204,12 +202,20 @@ end
 ---Step 6: Create issue and open in buffer
 ---@param state CreateIssueState
 local function step_6_create_issue(state)
-  cli.create_issue(state.type, state.summary, state.description, state.parent_key, {
+  cli.create_issue(state.type, state.summary, state.description, {
     success_msg = false, -- Handle manually
     error_msg = string.format("Failed to create %s", state.type),
     on_success = function(_, issue_key)
       if state.scratch_win then
         state.scratch_win:close()
+      end
+
+      -- Add to epic if requested
+      if state.parent_key then
+        cli.add_issue_to_epic(state.parent_key, issue_key, {
+          error_msg = string.format("Created %s but failed to add to epic", issue_key),
+          success_msg = false,
+        })
       end
 
       -- Move to sprint if requested
