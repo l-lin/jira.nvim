@@ -1,5 +1,6 @@
 local cli = require("jira.cli")
 local cache = require("jira.cache")
+local fetchers = require("jira.fetchers")
 
 local M = {}
 
@@ -31,22 +32,10 @@ end
 ---@param item snacks.picker.Item
 ---@param _ snacks.picker.Action
 function M.action_jira_transition(picker, item, _)
-  local project_key = item.key:match("^([^-]+)")
-
-  if not project_key then
-    vim.notify("Invalid project key", vim.log.levels.WARN)
-    return
-  end
-
-  local cached = cache.get(cache.keys.TRANSITIONS, { project = project_key })
-  if cached and cached.items then
-    show_transition_select(picker, item, cached.items)
-    return
-  end
-
-  cli.get_transitions(item.key, function(transitions)
-    if transitions and #transitions > 0 then
-      cache.set(cache.keys.TRANSITIONS, { project = project_key }, transitions)
+  fetchers.fetch_transitions(item.key, function(transitions)
+    if not transitions or #transitions == 0 then
+      vim.notify("No transitions available", vim.log.levels.WARN)
+      return
     end
     show_transition_select(picker, item, transitions)
   end)

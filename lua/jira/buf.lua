@@ -1,4 +1,4 @@
-local issue = require("jira.issue")
+local fetchers = require("jira.fetchers")
 
 ---@class jira.Buf
 ---@field buf number
@@ -63,8 +63,8 @@ function M:render(opts)
 
   opts = opts or {}
 
-  issue.fetch(self.issue_key, function(result, epic_info)
-    self:set_content(result, epic_info)
+  fetchers.fetch_issue(self.issue_key, function(result, epic)
+    self:set_content(result, epic)
   end)
 end
 

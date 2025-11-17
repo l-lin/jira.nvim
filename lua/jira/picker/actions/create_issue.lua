@@ -9,27 +9,9 @@
 
 local cli = require("jira.cli")
 local ui = require("jira.picker.ui")
+local fetchers = require("jira.fetchers")
 
 local M = {}
-
----Get issue types with caching
----@param callback fun(transitions: string[]?)
-local function get_issue_types(callback)
-  local cache = require("jira.cache")
-
-  local cached = cache.get(cache.keys.ISSUE_TYPES, nil)
-  if cached and cached.items then
-    callback(cached.items)
-    return
-  end
-
-  cli.get_issue_types(function(issue_types)
-    if issue_types and #issue_types > 0 then
-      cache.set(cache.keys.ISSUE_TYPES, nil, issue_types)
-    end
-    callback(issue_types)
-  end)
-end
 
 ---Show epic selection UI using Snacks picker
 ---@param callback fun(epic_key: string?)
@@ -49,30 +31,11 @@ local function show_epic_select(callback)
   })
 end
 
----Get sprints with caching
----@param callback fun(sprints: table[]?)
-local function get_sprints(callback)
-  local cache = require("jira.cache")
-
-  local cached = cache.get(cache.keys.SPRINTS)
-  if cached and cached.items then
-    callback(cached.items)
-    return
-  end
-
-  cli.get_sprints(function(sprints)
-    if sprints and #sprints > 0 then
-      cache.set(cache.keys.SPRINTS, nil, sprints)
-    end
-    callback(sprints)
-  end)
-end
-
 ---Step 1: Select issue type
 ---@param state CreateIssueState
 ---@param on_complete fun(state: CreateIssueState)
 local function step_1_select_type(state, on_complete)
-  get_issue_types(function(issue_types)
+  fetchers.fetch_issue_types(function(issue_types)
     vim.ui.select(issue_types, {
       prompt = "Select issue type:",
     }, function(selected_type)
@@ -157,7 +120,7 @@ local function step_5_select_sprint(state, on_complete)
       end
 
       if sprint_choice == "Yes" then
-        get_sprints(function(sprints)
+        fetchers.fetch_sprints(function(sprints)
           if not sprints or #sprints == 0 then
             vim.notify("No sprints available, creating issue without sprint", vim.log.levels.WARN)
             state.sprint_id = nil

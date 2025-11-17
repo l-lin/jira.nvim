@@ -1,5 +1,6 @@
 local cli = require("jira.cli")
 local cache = require("jira.cache")
+local fetchers = require("jira.fetchers")
 
 local M = {}
 
@@ -40,19 +41,12 @@ end
 ---@param action snacks.picker.Action
 ---@diagnostic disable-next-line: unused-local
 function M.action_jira_update_sprint(picker, item, action)
-  local cached = cache.get(cache.keys.SPRINTS)
-  if cached and cached.items then
-    show_sprint_select(picker, item, cached.items)
-    return
-  end
-
-  cli.get_sprints(function(sprints)
+  fetchers.fetch_sprints(function(sprints)
     if not sprints or #sprints == 0 then
       vim.notify("No active or future sprints available", vim.log.levels.WARN)
       return
     end
 
-    cache.set(cache.keys.SPRINTS, nil, sprints)
     show_sprint_select(picker, item, sprints)
   end)
 end

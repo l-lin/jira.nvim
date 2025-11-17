@@ -1,4 +1,4 @@
-local issue = require("jira.issue")
+local fetchers = require("jira.fetchers")
 
 local M = {}
 
@@ -53,8 +53,8 @@ function M.preview_jira_issue(ctx)
   ctx.preview:set_title(item.key)
   ctx.preview:notify("Loading issue details...", "info")
 
-  issue.fetch(item.key, function(result, epic_info)
-    display_result(ctx, result, epic_info)
+  fetchers.fetch_issue(item.key, function(result, epic)
+    display_result(ctx, result, epic)
   end)
 end
 
