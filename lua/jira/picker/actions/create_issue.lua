@@ -36,7 +36,7 @@ end
 local function show_epic_select(callback)
   local sources = require("jira.picker.sources")
 
-  require("snacks").picker(sources.source_jira_epics, {
+  require("snacks").picker("source_jira_epics", {
     ---@diagnostic disable-next-line: unused-local
     confirm = function(epic_picker, epic_item, action)
       epic_picker:close()
