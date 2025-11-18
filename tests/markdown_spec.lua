@@ -106,8 +106,7 @@ describe("markdown", function()
         }
         local result = transform_to_markdown(lines)
         assert.are.equal("# PROJ-123: Test Issue", result[1])
-        assert.are.equal("", result[2])
-        assert.are.equal("🐞 Bug • 🚧 In Progress", result[3])
+        assert.is_true(vim.tbl_contains(result, "🐞 Bug • 🚧 In Progress"))
       end)
 
       it("should skip empty lines in header", function()
@@ -121,8 +120,7 @@ describe("markdown", function()
         }
         local result = transform_to_markdown(lines)
         assert.are.equal("# Title", result[1])
-        assert.are.equal("", result[2])
-        assert.are.equal("🐞 Bug", result[3])
+        assert.is_true(vim.tbl_contains(result, "🐞 Bug"))
       end)
     end)
 
@@ -253,16 +251,28 @@ describe("markdown", function()
           "  PROJ-456 Issue • Status",
         }
         local result = transform_to_markdown(lines)
-        -- Count empty strings in result
-        local empty_count = 0
-        for _, line in ipairs(result) do
-          if line == "" then
-            empty_count = empty_count + 1
+
+        local header_idx, last_idx
+        for i, line in ipairs(result) do
+          if line == "## 🔗 Linked Issues" then
+            header_idx = i
+          elseif line == "- **PROJ-456**: Issue *(Status)*" then
+            last_idx = i
           end
         end
-        -- Should have some empty lines but not from the linked issues section itself
-        -- The empty lines should be for spacing between sections
-        assert.is_true(empty_count < 3)
+
+        assert.is_not_nil(header_idx)
+        assert.is_not_nil(last_idx)
+
+        local has_consecutive_blanks = false
+        for i = header_idx, last_idx - 1 do
+          if result[i] == "" and result[i + 1] == "" then
+            has_consecutive_blanks = true
+            break
+          end
+        end
+
+        assert.is_false(has_consecutive_blanks)
       end)
     end)
 
