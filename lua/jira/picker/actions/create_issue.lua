@@ -10,6 +10,7 @@
 local cli = require("jira.cli")
 local ui = require("jira.picker.ui")
 local fetchers = require("jira.fetchers")
+local cache = require("jira.cache")
 
 local M = {}
 
@@ -187,6 +188,8 @@ local function step_6_create_issue(state)
         if state.picker then
           state.picker:close()
         end
+        cache.clear(cache.keys.ISSUES)
+        cache.clear(cache.keys.EPIC_ISSUES)
       end, config.cli.timeout.issue_open_delay)
     end,
   })
