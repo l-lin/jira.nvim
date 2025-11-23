@@ -197,6 +197,10 @@ require("jira").setup({
         git_branch = true,     -- Create/switch to git branch
         yank = true,           -- Copy issue key to clipboard
       },
+      -- Optional callback invoked after all steps complete
+      on_done = function(ctx)
+        vim.notify("Starting to work on " .. ctx.item.key, vim.log.levels.INFO)
+      end,
     },
   },
 })

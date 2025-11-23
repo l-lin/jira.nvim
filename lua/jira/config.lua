@@ -62,6 +62,7 @@ local defaults = {
     -- 3. transition the issue to the configured state
     -- 4. create/change to git branch with the issue key as the branch name
     -- 5. yank the issue key to clipboard
+    -- 6. optionally run a user callback when all steps finish
     start_work = {
       -- Transition name to use when calling "Start work" action
       transition = "In Progress",
@@ -73,6 +74,9 @@ local defaults = {
         git_branch = true, -- Create/switch to git branch
         yank = true, -- Copy issue key to clipboard
       },
+      ---Optional callback invoked after all steps complete
+      ---@type jira.StartWorkDoneCallback?
+      on_done = nil,
     },
   },
 

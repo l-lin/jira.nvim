@@ -53,9 +53,19 @@
 ---@field git_branch? boolean Enable/disable creating/switching to git branch (default: true)
 ---@field yank? boolean Enable/disable copying issue key to clipboard (default: true)
 
+---@class jira.StartWorkDoneContext
+---@field item table Item representing the JIRA issue
+---@field errors string[] List of error messages for failed steps
+---@field successes string[] List of success messages for completed steps
+---@field picker? snacks.Picker Picker instance used for the action
+---@field action? snacks.picker.Action Action instance used for the callback
+
+---@alias jira.StartWorkDoneCallback fun(ctx: jira.StartWorkDoneContext)
+
 ---@class jira.ActionStartWorkConfig
 ---@field transition string the transition name to change for the issue when executing the action
 ---@field steps? jira.ActionStartWorkSteps configure which steps to execute (all enabled by default)
+---@field on_done? jira.StartWorkDoneCallback Optional callback invoked after all steps complete
 
 ---@class jira.ActionConfig
 ---@field start_work jira.ActionStartWorkConfig Start work action settings

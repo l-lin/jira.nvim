@@ -1,6 +1,6 @@
+local cache = require("jira.cache")
 local cli = require("jira.cli")
 local git = require("jira.git")
-local cache = require("jira.cache")
 
 local CLIPBOARD_REG = "+"
 local DEFAULT_REG = '"'
@@ -192,12 +192,27 @@ function M.action_jira_start_work(picker, item, action)
         end
         vim.notify(msg, vim.log.levels.WARN)
       else
-        vim.notify(string.format("Started working on %s", item.key), vim.log.levels.INFO)
+        vim.notify(string.format("Started working on %s", item.key or "issue"), vim.log.levels.INFO)
       end
 
-      cache.clear_issue_caches(item.key)
+      if item.key then
+        cache.clear_issue_caches(item.key)
+      end
       if picker then
         picker:refresh()
+      end
+
+      if config.action.start_work.on_done then
+        local ok = config.action.start_work.on_done({
+          item = item,
+          errors = errors,
+          successes = successes,
+          picker = picker,
+          action = action,
+        })
+        if not ok and config.debug then
+          vim.notify("jira.nvim on_done error: " .. tostring(err), vim.log.levels.ERROR)
+        end
       end
     end
   end

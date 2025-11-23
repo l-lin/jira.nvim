@@ -321,9 +321,9 @@ layout                                                         *jira-layout*
 
 action.start_work                                     *jira-action-start-work*
     Type: `table`
-
+ 
     Configuration for the "Start Work" action.
-
+ 
     Fields:
       • transition (string): The transition name to change the issue to
                             (default: "In Progress")
@@ -336,6 +336,10 @@ action.start_work                                     *jira-action-start-work*
                                (default: true)
         - git_branch (boolean): Create/switch to git branch (default: true)
         - yank (boolean): Copy issue key to clipboard (default: true)
+      • on_done (function|nil): Optional callback invoked after all
+                               steps complete. Receives a context table
+                               { item, errors, successes, picker, action }.
+
 
 preview.nb_comments                                   *jira-preview-comments*
     Type: `number`
@@ -467,6 +471,9 @@ Customize "Start Work" action:
             git_branch = true,
             yank = true,
           },
+          on_done = function(ctx)
+            vim.notify("Starting to work on " .. ctx.item.key, vim.log.levels.INFO)
+          end,
         },
       },
     })
