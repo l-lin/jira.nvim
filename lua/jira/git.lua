@@ -57,7 +57,7 @@ function M.generate_branch_name(issue_key, summary)
   if sanitized == "" then
     return issue_key
   end
-  return string.format("%s-%s", issue_key, sanitized)
+  return string.format("%s/%s", issue_key, sanitized)
 end
 
 return M
