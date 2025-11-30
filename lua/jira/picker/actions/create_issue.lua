@@ -37,15 +37,21 @@ end
 ---@param on_complete fun(state: CreateIssueState)
 local function step_1_select_type(state, on_complete)
   fetchers.fetch_issue_types(function(issue_types)
-    vim.ui.select(issue_types, {
-      prompt = "Select issue type:",
-    }, function(selected_type)
-      if not selected_type then
-        return -- User cancelled
-      end
+    vim.schedule(function ()
+      -- For some reason, it's starting on normal mode (maybe because it's in another floating window?).
+      -- So forcing making it on insert mode.
+      vim.cmd.startinsert()
+      vim.ui.select(
+        issue_types,
+        { prompt = "Select issue type:" },
+        function(selected_type)
+          if not selected_type then
+            return -- User cancelled
+          end
 
-      state.type = selected_type
-      on_complete(state)
+          state.type = selected_type
+          on_complete(state)
+        end)
     end)
   end)
 end

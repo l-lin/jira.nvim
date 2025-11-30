@@ -49,7 +49,7 @@ function M.prompt_text_input(opts)
 
   -- Start in insert mode at the end of the line
   vim.schedule(function()
-    vim.cmd("startinsert!")
+    vim.cmd.startinsert({ bang = true })
   end)
 end
 
@@ -79,9 +79,7 @@ function M.open_markdown_editor(opts)
         },
       },
       on_win = function()
-        vim.schedule(function()
-          vim.cmd.startinsert()
-        end)
+        vim.schedule(vim.cmd.startinsert)
       end,
     },
   })
