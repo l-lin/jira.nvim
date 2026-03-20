@@ -1,5 +1,7 @@
 # jira.nvim
 
+> [!IMPORTANT] Moved to [codeberg](https://codeberg.org/l-lin/jira.nvim).
+
 Neovim plugin for browsing and managing JIRA issues with a fuzzy-finding interface.
 
 > This plugin was heavily inspired by the awesome [snacks.nvim gh plugin](https://github.com/folke/snacks.nvim/blob/main/docs/gh.md)!
